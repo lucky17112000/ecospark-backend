@@ -1,7 +1,13 @@
 import status from "http-status";
 import AppError from "../../errorHelper.ts/AppError";
 import { auth } from "../../lib/auth";
-import { IRegisterPatientPayload } from "./auth.interface";
+import {
+  IChangePasswordPayload,
+  ILoginUserPayload,
+  IRegisterPatientPayload,
+} from "./auth.interface";
+import { USER_STATUS } from "../../../generated/prisma/enums";
+import { prisma } from "../../lib/prisma";
 
 const registrationUser = async (payload: IRegisterPatientPayload) => {
   const { name, email, password } = payload;
@@ -17,4 +23,59 @@ const registrationUser = async (payload: IRegisterPatientPayload) => {
   }
 
   return data.user;
+};
+
+const logInUser = async (payload: ILoginUserPayload) => {
+  const { email, password } = payload;
+  const data = await auth.api.signInEmail({
+    body: {
+      email,
+      password,
+    },
+  });
+  if (!data.user) {
+    throw new AppError(status.BAD_REQUEST, "Invalid email or password");
+  }
+  if (data.user.status === USER_STATUS.BLOCKED) {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Your account has been blocked. Please contact support for assistance.",
+    );
+  }
+  if (data.user.isDeleted) {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Your account has been deleted. Please contact support for assistance.",
+    );
+  }
+  //!todo access token and refresh token handling
+  return data;
+};
+
+const getMe = async () => {};
+
+const changePassword = async (payload: IChangePasswordPayload) => {
+  // const session  =
+};
+
+const verifyEmail = async (email: string, otp: string) => {
+  const result = await auth.api.verifyEmailOTP({
+    body: {
+      email,
+      otp,
+    },
+  });
+  if (result.status && result.user.emailVerified) {
+    await prisma.user.update({
+      where: { email },
+      data: { emailVerified: true },
+    });
+  }
+};
+export const authService = {
+  registrationUser,
+  logInUser,
+  getMe,
+  changePassword,
+  verifyEmail,
 };
