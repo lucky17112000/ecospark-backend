@@ -6,17 +6,22 @@ import {
   ILoginUserPayload,
   IRegisterPatientPayload,
 } from "./auth.interface";
-import { USER_STATUS } from "../../../generated/prisma/enums";
+import { Role, USER_STATUS } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { tokenUtil } from "../../utiles/token";
 
 const registrationUser = async (payload: IRegisterPatientPayload) => {
-  const { name, email, password } = payload;
+  const { name, email, password, role } = payload;
+  const normalizedRole =
+    typeof role === "string" ? (role.toUpperCase() as Role) : role;
   const data = await auth.api.signUpEmail({
     body: {
       name,
       email,
       password,
+      ...(normalizedRole === Role.ADMIN || normalizedRole === Role.USER
+        ? { role: normalizedRole }
+        : {}),
     },
   });
   if (!data.user) {
