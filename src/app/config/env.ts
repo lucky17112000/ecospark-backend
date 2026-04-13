@@ -19,6 +19,9 @@ interface EnvConfig {
   DATABASE_URL: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
+  ACCESS_TOKEN_SECRET: string;
+  ACCESS_TOKEN_EXPIRES_IN: string;
+  REFRESH_TOKEN_EXPIRES_IN: string;
   EMAIL_SENDER: {
     EMAIL_SENDER_SMTP_USER: string;
     EMAIL_SENDER_SMTP_PASS: string;
@@ -39,6 +42,9 @@ const loadEnvVariables = (): EnvConfig => {
     "EMAIL_SENDER_SMTP_HOST",
     "EMAIL_SENDER_SMTP_PORT",
     "EMAIL_SENDER_SMTP_FROM",
+    "ACCESS_TOKEN_SECRET",
+    "ACCESS_TOKEN_EXPIRES_IN",
+    "REFRESH_TOKEN_EXPIRES_IN",
   ];
   requiredEnvVars.forEach((variable: string) => {
     if (!process.env[variable]) {
@@ -56,6 +62,9 @@ const loadEnvVariables = (): EnvConfig => {
     DATABASE_URL: process.env.DATABASE_URL as string,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET as string,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL as string,
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET as string,
+    ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
+    REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
     EMAIL_SENDER: {
       EMAIL_SENDER_SMTP_USER: process.env.EMAIL_SENDER_SMTP_USER as string,
       EMAIL_SENDER_SMTP_PASS: process.env.EMAIL_SENDER_SMTP_PASS as string,

@@ -4,10 +4,16 @@ import { authService } from "./auth.service";
 import { sendResponse } from "../../../shared/sendResponse";
 import status from "http-status";
 import { auth } from "../../lib/auth";
+import { tokenUtil } from "../../utiles/token";
 
 const registerUser = catchasync(async (req: Request, res: Response) => {
   const payload = req.body;
   const result = await authService.registrationUser(payload);
+  const { accessToken, refreshToken, token, ...rest } = result;
+  tokenUtil.setAccessTokenCookie(res, accessToken);
+  tokenUtil.setRefreshTokenCookie(res, refreshToken);
+  tokenUtil.setBetterAuthSessionCookie(res, token as string);
+
   sendResponse(res, {
     httpStatusCode: status.CREATED,
     success: true,
@@ -29,6 +35,10 @@ const verifyEmail = catchasync(async (req: Request, res: Response) => {
 const logInUser = catchasync(async (req: Request, res: Response) => {
   const payload = req.body;
   const result = await authService.logInUser(payload);
+  const { accessToken, refreshToken, token, ...rest } = result;
+  tokenUtil.setAccessTokenCookie(res, accessToken);
+  tokenUtil.setRefreshTokenCookie(res, refreshToken);
+  tokenUtil.setBetterAuthSessionCookie(res, token);
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,

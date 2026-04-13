@@ -8,6 +8,7 @@ import {
 } from "./auth.interface";
 import { USER_STATUS } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+import { tokenUtil } from "../../utiles/token";
 
 const registrationUser = async (payload: IRegisterPatientPayload) => {
   const { name, email, password } = payload;
@@ -22,7 +23,26 @@ const registrationUser = async (payload: IRegisterPatientPayload) => {
     throw new AppError(status.BAD_REQUEST, "Failed to register user");
   }
 
-  return data.user;
+  const accessToken = tokenUtil.getAccessToken({
+    userId: data.user.id,
+    role: data.user.role,
+    name: data.user.name,
+    email: data.user.email,
+    emailVerified: data.user.emailVerified,
+    status: data.user.status,
+    isDeleted: data.user.isDeleted,
+  });
+  const refreshToken = tokenUtil.getRefreshToken({
+    userId: data.user.id,
+    role: data.user.role,
+    name: data.user.name,
+    email: data.user.email,
+    emailVerified: data.user.emailVerified,
+    status: data.user.status,
+    isDeleted: data.user.isDeleted,
+  });
+
+  return { ...data, accessToken, refreshToken };
 };
 
 const logInUser = async (payload: ILoginUserPayload) => {
@@ -49,7 +69,26 @@ const logInUser = async (payload: ILoginUserPayload) => {
     );
   }
   //!todo access token and refresh token handling
-  return data;
+
+  const accessToken = tokenUtil.getAccessToken({
+    userId: data.user.id,
+    role: data.user.role,
+    name: data.user.name,
+    email: data.user.email,
+    emailVerified: data.user.emailVerified,
+    status: data.user.status,
+    isDeleted: data.user.isDeleted,
+  });
+  const refreshToken = tokenUtil.getRefreshToken({
+    userId: data.user.id,
+    role: data.user.role,
+    name: data.user.name,
+    email: data.user.email,
+    emailVerified: data.user.emailVerified,
+    status: data.user.status,
+    isDeleted: data.user.isDeleted,
+  });
+  return { ...data, accessToken, refreshToken };
 };
 
 const getMe = async () => {};

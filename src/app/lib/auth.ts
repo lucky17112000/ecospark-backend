@@ -78,4 +78,35 @@ export const auth = betterAuth({
       otpLength: 6,
     }),
   ],
+  session: {
+    expiresIn: 60 * 60 * 60 * 24, // 1 day in seconds
+    updateAge: 60 * 60 * 60 * 24, // 1 day in seconds
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 60 * 24, // 1 day in seconds
+    },
+  },
+
+  advanced: {
+    // disableCSRFCheck: true,
+    useSecureCookies: false,
+    cookies: {
+      state: {
+        attributes: {
+          sameSite: "none",
+          secure: true,
+          httpOnly: true,
+          path: "/",
+        },
+      },
+      sessionToken: {
+        attributes: {
+          sameSite: "none",
+          secure: true,
+          httpOnly: true,
+          path: "/",
+        },
+      },
+    },
+  },
 });
