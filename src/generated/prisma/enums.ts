@@ -24,3 +24,41 @@ export const USER_STATUS = {
 } as const
 
 export type USER_STATUS = (typeof USER_STATUS)[keyof typeof USER_STATUS]
+
+
+export const IDEA_STATUS = {
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type IDEA_STATUS = (typeof IDEA_STATUS)[keyof typeof IDEA_STATUS]
+
+
+export const PaymentStatus = {
+  PAID: 'PAID',
+  UNPAID: 'UNPAID'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const FEEDBACK_REASON = {
+  FEASIBILITY_ISSUE: 'FEASIBILITY_ISSUE',
+  INCOMPLETE: 'INCOMPLETE',
+  DUPLICATE_IDEA: 'DUPLICATE_IDEA',
+  IRRELEVANT: 'IRRELEVANT',
+  OTHER: 'OTHER'
+} as const
+
+export type FEEDBACK_REASON = (typeof FEEDBACK_REASON)[keyof typeof FEEDBACK_REASON]
+
+
+export const VOTE_TYPE = {
+  UP: 'UP',
+  DOWN: 'DOWN'
+} as const
+
+export type VOTE_TYPE = (typeof VOTE_TYPE)[keyof typeof VOTE_TYPE]

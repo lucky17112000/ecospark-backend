@@ -13,6 +13,13 @@ model User {
     updatedAt          DateTime    @updatedAt
     sessions           Session[]
     accounts           Account[]
+    // categories         Category[]
+    ideas              Idea[]
+    feedbacks          Feedback[]
+    votes              Vote[]
+     payments  Payment[]
+  purchases Purchase[]
+    
 
     @@unique([email])
     @@map("user")

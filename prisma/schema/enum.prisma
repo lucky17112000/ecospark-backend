@@ -8,3 +8,29 @@ enum USER_STATUS {
     BLOCKED
     DELETED
 }
+
+enum IDEA_STATUS {
+    UNDER_REVIEW
+    APPROVED
+    REJECTED
+    PUBLISHED
+    ARCHIVED
+}
+
+enum PaymentStatus {
+    PAID
+    UNPAID
+}
+
+enum FEEDBACK_REASON {
+    FEASIBILITY_ISSUE
+    INCOMPLETE
+    DUPLICATE_IDEA
+    IRRELEVANT
+    OTHER
+}
+
+enum VOTE_TYPE {
+    UP
+    DOWN
+}

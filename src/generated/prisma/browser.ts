@@ -42,3 +42,28 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type Category = Prisma.CategoryModel
+/**
+ * Model Feedback
+ * 
+ */
+export type Feedback = Prisma.FeedbackModel
+/**
+ * Model Idea
+ * 
+ */
+export type Idea = Prisma.IdeaModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model Purchase
+ * 
+ */
+export type Purchase = Prisma.PurchaseModel
+/**
+ * Model Vote
+ * 
+ */
+export type Vote = Prisma.VoteModel
