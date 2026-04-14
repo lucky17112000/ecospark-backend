@@ -197,6 +197,7 @@ export const PaymentScalarFieldEnum = {
   paymentGatewayData: 'paymentGatewayData',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  purchaseId: 'purchaseId',
   userId: 'userId'
 } as const
 
@@ -207,7 +208,7 @@ export const PurchaseScalarFieldEnum = {
   id: 'id',
   ideaId: 'ideaId',
   userId: 'userId',
-  paymentId: 'paymentId',
+  paymentStatus: 'paymentStatus',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -5,6 +5,7 @@ import { ideaRouter } from "../module/idea/idea.route";
 import { feedbackRouter } from "../module/feedback/feedback.router";
 
 import { voteRouter } from "../module/vote/vote.route";
+import { purchaseRouter } from "../module/purchase/purchase.route";
 
 const router = Router();
 router.use("/auth", authRouter);
@@ -12,5 +13,6 @@ router.use("/category", categoryRouter);
 router.use("/idea", ideaRouter);
 router.use("/feedback", feedbackRouter);
 router.use("/vote", voteRouter);
+router.use("/purchase", purchaseRouter);
 
 export const appRouter = router;

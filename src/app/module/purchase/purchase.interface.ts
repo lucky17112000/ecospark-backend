@@ -1,3 +1,5 @@
+/*
+
 model Purchase {
     id     String @id @default(uuid())
     ideaId String
@@ -13,4 +15,10 @@ model Purchase {
     @@index([ideaId])
     @@index([userId])
     @@map("purchases")
+}
+
+*/
+export interface ICreatePurchasePayload {
+  ideaId: string;
+  userId: string;
 }
