@@ -9,6 +9,7 @@ import {
 import { Role, USER_STATUS } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { tokenUtil } from "../../utiles/token";
+import { IRequestUser } from "../../interface/requestUser.interface";
 
 const registrationUser = async (payload: IRegisterPatientPayload) => {
   const { name, email, password, role } = payload;
@@ -96,7 +97,25 @@ const logInUser = async (payload: ILoginUserPayload) => {
   return { ...data, accessToken, refreshToken };
 };
 
-const getMe = async () => {};
+const getMe = async (user: IRequestUser) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: user.email },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      emailVerified: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  if (!existingUser) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
+  return existingUser;
+};
 
 const changePassword = async (payload: IChangePasswordPayload) => {
   // const session  =

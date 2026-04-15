@@ -5,6 +5,7 @@ import { sendResponse } from "../../../shared/sendResponse";
 import status from "http-status";
 import { auth } from "../../lib/auth";
 import { tokenUtil } from "../../utiles/token";
+import AppError from "../../errorHelper.ts/AppError";
 
 const registerUser = catchasync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -47,8 +48,22 @@ const logInUser = catchasync(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = catchasync(async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+  }
+  const result = await authService.getMe(req.user);
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "User retrieved successfully",
+    data: result,
+  });
+});
+
 export const authController = {
   registerUser,
   verifyEmail,
   logInUser,
+  getMe,
 };
