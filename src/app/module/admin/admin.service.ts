@@ -10,6 +10,15 @@ const getAllUsersByAdmn = async (user: IRequestUser) => {
       "Only admins can access this resource",
     );
   }
+  const chkAdmin = await prisma.user.findUnique({
+    where: { id: user.email },
+  });
+  if (chkAdmin?.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
 
   const result = await prisma.user.findMany({
     select: {
@@ -31,6 +40,15 @@ const updateUserRoleByAdmin = async (
   user: IRequestUser,
 ) => {
   if (user.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
+  const chkAdmin = await prisma.user.findUnique({
+    where: { id: user.email },
+  });
+  if (chkAdmin?.role !== "ADMIN") {
     throw new AppError(
       status.FORBIDDEN,
       "Only admins can access this resource",
@@ -66,17 +84,17 @@ const getOneUserByAdmin = async (userId: string, user: IRequestUser) => {
       "Only admins can access this resource",
     );
   }
-  const chkAdmin  =  await prisma.user.findUnique({
+  const chkAdmin = await prisma.user.findUnique({
     where: { id: user.email },
-  })
-  if(chkAdmin?.role !== "ADMIN"){
+  });
+  if (chkAdmin?.role !== "ADMIN") {
     throw new AppError(
       status.FORBIDDEN,
       "Only admins can access this resource",
     );
   }
-  const result  =  await prisma.user.findUnique({
-    where:{id: userId},
+  const result = await prisma.user.findUnique({
+    where: { id: userId },
     select: {
       id: true,
       email: true,
@@ -84,8 +102,8 @@ const getOneUserByAdmin = async (userId: string, user: IRequestUser) => {
       createdAt: true,
       updatedAt: true,
     },
-  })
-  if(!result){
+  });
+  if (!result) {
     throw new AppError(status.NOT_FOUND, "User not found");
   }
   return result;
