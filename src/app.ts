@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import { prisma } from "./app/lib/prisma";
 import { appRouter } from "./app/routes";
 import cookieParser from "cookie-parser";
@@ -7,6 +7,8 @@ import cron from "node-cron";
 import { ideaService } from "./app/module/idea/idea.services";
 import { envVars } from "./app/config/env";
 import cors from "cors";
+import AppError from "./app/errorHelper.ts/AppError";
+import status from "http-status";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -43,5 +45,17 @@ cron.schedule("*/30 * * * *", async () => {
 });
 
 app.use("/api/v1", appRouter);
+
+//basic route
+app.get("/", async (req: Request, res: Response, next: NextFunction) => {
+  throw new AppError(
+    status.BAD_REQUEST,
+    "This is a sample error from the root route",
+  );
+  res.status(200).json({
+    success: true,
+    message: "Welcome to PH Healthcare API",
+  });
+});
 
 export default app;
