@@ -4,6 +4,14 @@ import { prisma } from "../../lib/prisma";
 import { IcreateIdeaPayload, IUpdateIdeaPayload } from "./idea.interface";
 import { th } from "zod/locales";
 import { IRequestUser } from "../../interface/requestUser.interface";
+import { QueryBuilder } from "../../utiles/QueryBuilder";
+import { IQueryParams } from "../../interface/query.interface";
+import {
+  ideaFilterableFields,
+  ideaIncludeConfig,
+  ideaSearchableFields,
+} from "./idea.constant";
+import { Idea, Prisma } from "../../../generated/prisma/client";
 
 const createIdea = async (payload: IcreateIdeaPayload) => {
   const {
@@ -39,17 +47,53 @@ const createIdea = async (payload: IcreateIdeaPayload) => {
   return IdeaData;
 };
 
-const getAllIdeas = async () => {
-  const ideas = await prisma.idea.findMany({
-    include: {
+const getAllIdeas = async (query: IQueryParams) => {
+  // const ideas = await prisma.idea.findMany({
+  //   include: {
+  //     author: true,
+  //     category: true,
+  //     votes: true,
+  //     feedback: true,
+  //     purchases: true,
+  //   },
+  // });
+  // return ideas;
+
+  const normalizedQuery: IQueryParams = { ...query };
+
+  // If `searchTerm` is a number (e.g. "10"), treat it as a price filter.
+  // This avoids Prisma "contains" errors on numeric fields and matches exact prices.
+  const searchTerm = normalizedQuery.searchTerm?.trim();
+  if (searchTerm && !Number.isNaN(Number(searchTerm))) {
+    normalizedQuery.price = searchTerm;
+    delete normalizedQuery.searchTerm;
+  }
+
+  const queryBuilder = new QueryBuilder<
+    Idea,
+    Prisma.IdeaWhereInput,
+    Prisma.IdeaInclude
+  >(prisma.idea, normalizedQuery, {
+    searchableFields: ideaSearchableFields,
+    filterableFields: ideaFilterableFields,
+  });
+
+  const result = await queryBuilder
+    .search()
+    .filter()
+    .sort()
+    .paginate()
+    .fields()
+    .include({
       author: true,
       category: true,
       votes: true,
       feedback: true,
       purchases: true,
-    },
-  });
-  return ideas;
+    })
+    .dynamicInclude(ideaIncludeConfig)
+    .execute();
+  return result;
 };
 
 const getIdeaById = async (id: string) => {

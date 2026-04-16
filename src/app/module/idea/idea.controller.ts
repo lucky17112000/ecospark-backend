@@ -5,6 +5,7 @@ import { sendResponse } from "../../../shared/sendResponse";
 import status from "http-status";
 import { IRequestUser } from "../../interface/requestUser.interface";
 import AppError from "../../errorHelper.ts/AppError";
+import { IQueryParams } from "../../interface/query.interface";
 
 const createIdea = async (req: Request, res: Response) => {
   // console.log("Request body:", req.body);
@@ -23,12 +24,14 @@ const createIdea = async (req: Request, res: Response) => {
 };
 
 const getAllIdeas = async (req: Request, res: Response) => {
-  const result = await ideaService.getAllIdeas();
+  const query = req.query;
+  const result = await ideaService.getAllIdeas(query as IQueryParams);
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,
     message: "Idea retrived successfully",
-    data: result,
+    data: result.data,
+    meta: result.meta,
   });
 };
 const getIdeayId = async (req: Request, res: Response) => {
