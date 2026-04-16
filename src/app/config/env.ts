@@ -22,12 +22,17 @@ interface EnvConfig {
   ACCESS_TOKEN_SECRET: string;
   ACCESS_TOKEN_EXPIRES_IN: string;
   REFRESH_TOKEN_EXPIRES_IN: string;
+  FRONTEND_URL: string;
   EMAIL_SENDER: {
     EMAIL_SENDER_SMTP_USER: string;
     EMAIL_SENDER_SMTP_PASS: string;
     EMAIL_SENDER_SMTP_HOST: string;
     EMAIL_SENDER_SMTP_PORT: string;
     EMAIL_SENDER_SMTP_FROM: string;
+  };
+  STRIPE: {
+    STRIPE_SECRET_KEY: string;
+    STRIPE_WEBHOOK_SECRET: string;
   };
 }
 const loadEnvVariables = (): EnvConfig => {
@@ -45,6 +50,9 @@ const loadEnvVariables = (): EnvConfig => {
     "ACCESS_TOKEN_SECRET",
     "ACCESS_TOKEN_EXPIRES_IN",
     "REFRESH_TOKEN_EXPIRES_IN",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "FRONTEND_URL",
   ];
   requiredEnvVars.forEach((variable: string) => {
     if (!process.env[variable]) {
@@ -72,6 +80,11 @@ const loadEnvVariables = (): EnvConfig => {
       EMAIL_SENDER_SMTP_PORT: process.env.EMAIL_SENDER_SMTP_PORT as string,
       EMAIL_SENDER_SMTP_FROM: process.env.EMAIL_SENDER_SMTP_FROM as string,
     },
+    STRIPE: {
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string,
+    },
+    FRONTEND_URL: process.env.FRONTEND_URL as string,
   };
 };
 export const envVars = loadEnvVariables();

@@ -3,6 +3,9 @@ import AppError from "../../errorHelper.ts/AppError";
 import { IRequestUser } from "../../interface/requestUser.interface";
 import { prisma } from "../../lib/prisma";
 import { ICreatePurchasePayload } from "./purchase.interface";
+import { randomUUID } from "node:crypto";
+import { stripe } from "../../config/stripe.config";
+import { envVars } from "../../config/env";
 
 const createPurchase = async (
   payload: ICreatePurchasePayload,
@@ -39,7 +42,54 @@ const createPurchase = async (
       user: true,
     },
   });
-  return result;
+
+  if (ideaData.price == null) {
+    throw new AppError(status.BAD_REQUEST, "Idea price is not set");
+  }
+
+  const transactionId = randomUUID();
+  const paymentData = await prisma.payment.create({
+    data: {
+      purchaseId: result.id,
+      ideaId: ideaData.id,
+      amount: ideaData.price,
+      transactionId,
+      userId: user.userId,
+    },
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "bdt",
+          unit_amount: ideaData.price * 120,
+          product_data: {
+            name: ideaData.title,
+            description: ideaData.description,
+          },
+        },
+        quantity: 1,
+      },
+    ],
+
+    metadata: {
+      purchaseId: result.id,
+      paymentId: paymentData.id,
+    },
+
+    success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success`,
+    cancel_url: `${envVars.FRONTEND_URL}/dashboard/purchase`,
+  });
+
+  return {
+    paymentData,
+    sessionUrl: session.url,
+    sessionId: session.id,
+    result,
+  };
 };
 
 const getAllPurchases = async () => {
