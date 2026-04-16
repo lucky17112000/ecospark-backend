@@ -2,17 +2,26 @@ import status from "http-status";
 import AppError from "../../errorHelper.ts/AppError";
 import { IRequestUser } from "../../interface/requestUser.interface";
 import { prisma } from "../../lib/prisma";
+import { IQueryParams } from "../../interface/query.interface";
+import { QueryBuilder } from "../../utiles/QueryBuilder";
+import { Prisma, User } from "../../../generated/prisma/client";
 
-const getAllUsersByAdmn = async (user: IRequestUser) => {
+const getAllUsersByAdmn = async (
+  user: IRequestUser,
+  query: IQueryParams = {},
+) => {
   if (user.role !== "ADMIN") {
     throw new AppError(
       status.FORBIDDEN,
       "Only admins can access this resource",
     );
   }
+
   const chkAdmin = await prisma.user.findUnique({
-    where: { id: user.email },
+    where: { id: user.userId },
+    select: { role: true },
   });
+
   if (chkAdmin?.role !== "ADMIN") {
     throw new AppError(
       status.FORBIDDEN,
@@ -20,19 +29,38 @@ const getAllUsersByAdmn = async (user: IRequestUser) => {
     );
   }
 
-  const result = await prisma.user.findMany({
-    select: {
-      id: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+  const normalizedQuery: IQueryParams = { ...query };
+
+  const queryBuilder = new QueryBuilder<
+    User,
+    Prisma.UserWhereInput,
+    Prisma.UserInclude
+  >(prisma.user, normalizedQuery, {
+    searchableFields: ["email", "id"],
+    filterableFields: ["createdAt", "updatedAt", "role"],
   });
-  const deleteOwnAccountFromResult = result.filter(
-    (u) => u.email !== user.email,
-  );
-  return deleteOwnAccountFromResult;
+
+  const result = await queryBuilder
+    .search()
+    .filter()
+    .sort()
+    .paginate()
+    .include({
+       
+      _count: {
+        select: {
+          
+          ideas: true,
+          feedbacks: true,
+          votes: true,
+          payments: true,
+          purchases: true,
+        },
+      },
+    })
+    .execute();
+
+  return result;
 };
 const updateUserRoleByAdmin = async (
   userId: string,
@@ -46,7 +74,7 @@ const updateUserRoleByAdmin = async (
     );
   }
   const chkAdmin = await prisma.user.findUnique({
-    where: { id: user.email },
+    where: { id: user.userId },
   });
   if (chkAdmin?.role !== "ADMIN") {
     throw new AppError(
@@ -85,7 +113,7 @@ const getOneUserByAdmin = async (userId: string, user: IRequestUser) => {
     );
   }
   const chkAdmin = await prisma.user.findUnique({
-    where: { id: user.email },
+    where: { id: user.userId },
   });
   if (chkAdmin?.role !== "ADMIN") {
     throw new AppError(

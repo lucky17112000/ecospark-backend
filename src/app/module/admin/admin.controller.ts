@@ -10,11 +10,18 @@ const getAllUsersByAdmin = catchasync(async (req: Request, res: Response) => {
   if (!req.user) {
     throw new AppError(status.UNAUTHORIZED, "Unauthorized");
   }
-  const result = await adminService.getAllUsersByAdmn(req.user as IRequestUser);
+
+  const query = req.query;
+  const result = await adminService.getAllUsersByAdmn(
+    req.user as IRequestUser,
+    query as unknown as import("../../interface/query.interface").IQueryParams,
+  );
+
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,
-    data: result,
+    data: result.data,
+    meta: result.meta,
     message: "All users retrieved successfully",
   });
 });

@@ -364,7 +364,10 @@ export class QueryBuilder<
       }
     });
 
-    const includeParam = this.queryParams.include as string | undefined;
+    const includeParam = (this.queryParams.include ??
+      (this.queryParams as Record<string, unknown>).includes) as
+      | string
+      | undefined;
 
     if (includeParam && typeof includeParam === "string") {
       const requestedRelations = includeParam
