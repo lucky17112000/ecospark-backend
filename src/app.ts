@@ -9,6 +9,8 @@ import { envVars } from "./app/config/env";
 import cors from "cors";
 import AppError from "./app/errorHelper.ts/AppError";
 import status from "http-status";
+import { globalErrorHandler } from "./app/midddlware/globalErrorHandler";
+import { notFound } from "./app/midddlware/notFound";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -58,4 +60,6 @@ app.get("/", async (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+app.use(globalErrorHandler);
+app.use(notFound);
 export default app;
