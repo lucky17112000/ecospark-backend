@@ -11,9 +11,10 @@ import { TErrorResponse, TErrorSource } from "../interface/error.interface";
 import { handleZodError } from "../errorHelper.ts/HandleZodError";
 import AppError from "../errorHelper.ts/AppError";
 import { envVars } from "../config/env";
+import { deleteFileFromCloudinary } from "../config/cloudinary.config";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const globalErrorHandler = (
+export const globalErrorHandler = async (
   err: any,
   req: Request,
   res: Response,
@@ -23,6 +24,22 @@ export const globalErrorHandler = (
     console.log("Error from Global Error Handler", err);
   }
 
+  const safeDelete = async (url: string) => {
+    try {
+      await deleteFileFromCloudinary(url);
+    } catch {
+      console.error("Cleanup failed for:", url);
+    }
+  };
+
+  if (req.file) {
+    await safeDelete(req.file.path); // remove optional chaining, req.file is already checked
+  }
+
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    const urls = (req.files as Express.Multer.File[]).map((file) => file.path);
+    await Promise.all(urls.map(safeDelete)); // run deletions in parallel
+  }
   let errorSources: TErrorSource[] = [];
   let statusCode: number = status.INTERNAL_SERVER_ERROR;
   let message: string = "Internal Server Error";
