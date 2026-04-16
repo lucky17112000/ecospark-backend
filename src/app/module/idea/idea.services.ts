@@ -173,6 +173,20 @@ const deleteIdea = async (id: string, user: IRequestUser) => {
 
   return result;
 };
+const deleteByCornJobwhenSoftDeleted = async () => {
+  const result = await prisma.idea.deleteMany({
+    where: {
+      isDeleted: true,
+      deletedAt: {
+        lt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // Soft deleted for more than 1 day
+      },
+    },
+  });
+  const deletedCount = result.count || 0;
+  return {
+    message: `${deletedCount} soft deleted ideas that were marked for deletion more than 1 day ago have been permanently removed.`,
+  };
+};
 
 const deleteIdeaSoft = async (id: string, user: IRequestUser) => {
   if (!id) {
@@ -218,4 +232,5 @@ export const ideaService = {
   updateIdea,
   deleteIdea,
   deleteIdeaSoft,
+  deleteByCornJobwhenSoftDeleted,
 };
