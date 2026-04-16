@@ -7,7 +7,12 @@ import { IRequestUser } from "../../interface/requestUser.interface";
 import AppError from "../../errorHelper.ts/AppError";
 
 const createIdea = async (req: Request, res: Response) => {
-  const data = req.body;
+  // console.log("Request body:", req.body);
+  console.log("Request files:", req.files);
+  const data = {
+    ...req.body,
+    images: (req.files as Express.Multer.File[]).map((file) => file.path),
+  };
   const result = await ideaService.createIdea(data as IcreateIdeaPayload);
   sendResponse(res, {
     httpStatusCode: status.CREATED,
@@ -56,7 +61,10 @@ const deleteIdea = async (req: Request, res: Response) => {
   if (!req.user) {
     throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
   }
-  const result = await ideaService.deleteIdea(id as string, req.user as IRequestUser);
+  const result = await ideaService.deleteIdea(
+    id as string,
+    req.user as IRequestUser,
+  );
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,
@@ -73,7 +81,10 @@ const deleteIdeaSoft = async (req: Request, res: Response) => {
   if (!req.user) {
     throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
   }
-  const result = await ideaService.deleteIdeaSoft(id as string, req.user as IRequestUser);
+  const result = await ideaService.deleteIdeaSoft(
+    id as string,
+    req.user as IRequestUser,
+  );
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,

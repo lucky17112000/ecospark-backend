@@ -23,9 +23,9 @@ const createIdeaZodSchema = z.object({
   description: z
     .string()
     .min(20, "Description must be at least 20 characters long"),
-  images: z.array(z.string()).optional(),
+  // images: z.array(z.string()).optional(),
   categoryId: z.string(),
-  authorId:z.string(),
+  authorId: z.string(),
   price: z.number().positive("Price must be a positive number").optional(),
 });
 

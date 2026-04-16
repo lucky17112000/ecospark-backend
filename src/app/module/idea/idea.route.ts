@@ -4,10 +4,13 @@ import { validateRequest } from "../../midddlware/validateRequest";
 import { ideaValidator } from "./idea.valiators";
 import { cheakAuth } from "../../midddlware/cheakAuth";
 import { Role } from "../../../generated/prisma/enums";
+import { multerUpload } from "../../config/multer.config";
 
 const router = Router();
 router.post(
   "/",
+  cheakAuth(Role.USER),
+  multerUpload.array("files"),
   validateRequest(ideaValidator.createIdeaZodSchema),
   ideaController.createIdea,
 );
