@@ -6,13 +6,17 @@ import status from "http-status";
 import { IRequestUser } from "../../interface/requestUser.interface";
 import AppError from "../../errorHelper.ts/AppError";
 import { IQueryParams } from "../../interface/query.interface";
+import { catchasync } from "../../../shared/cathAsync";
 
 const createIdea = async (req: Request, res: Response) => {
   // console.log("Request body:", req.body);
   console.log("Request files:", req.files);
+  const uploadedFiles: Express.Multer.File[] = Array.isArray(req.files)
+    ? (req.files as Express.Multer.File[])
+    : [];
   const data = {
     ...req.body,
-    images: (req.files as Express.Multer.File[]).map((file) => file.path),
+    images: uploadedFiles.map((file) => file.path),
   };
   const result = await ideaService.createIdea(data as IcreateIdeaPayload);
   sendResponse(res, {
@@ -96,6 +100,26 @@ const deleteIdeaSoft = async (req: Request, res: Response) => {
   });
 };
 
+const updateIdeaStatuswithFeedback = catchasync(
+  async (req: Request, res: Response) => {
+    const id = req.user;
+    const data = req.body;
+    if (!id) {
+      throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+    }
+    const result = await ideaService.updateIdeaStatusWithFeedback(
+      id as IRequestUser,
+      data,
+    );
+    sendResponse(res, {
+      httpStatusCode: status.OK,
+      success: true,
+      message: "Idea status updated successfully",
+      data: result,
+    });
+  },
+);
+
 export const ideaController = {
   createIdea,
   getAllIdeas,
@@ -103,4 +127,5 @@ export const ideaController = {
   updateIdea,
   deleteIdea,
   deleteIdeaSoft,
+  updateIdeaStatuswithFeedback,
 };

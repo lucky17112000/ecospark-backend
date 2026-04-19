@@ -13,6 +13,7 @@ export interface IcreateIdeaPayload {
 */
 
 import z from "zod";
+import { FEEDBACK_REASON, IDEA_STATUS } from "../../../generated/prisma/enums";
 
 const createIdeaZodSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long"),
@@ -26,9 +27,33 @@ const createIdeaZodSchema = z.object({
   // images: z.array(z.string()).optional(),
   categoryId: z.string(),
   authorId: z.string(),
-  price: z.number().positive("Price must be a positive number").optional(),
+  // Multipart/form-data sends all text fields as strings.
+  price: z.coerce
+    .number()
+    .positive("Price must be a positive number")
+    .optional(),
+});
+
+const updateIdeaStatusZodSchema = z.object({
+  ideaId: z.string().min(1, "ideaId is required"),
+  ideaStatus: z.enum([
+    IDEA_STATUS.UNDER_REVIEW,
+    IDEA_STATUS.APPROVED,
+    IDEA_STATUS.REJECTED,
+    IDEA_STATUS.PUBLISHED,
+    IDEA_STATUS.ARCHIVED,
+  ]),
+  message: z.string().min(1, "message is required"),
+  reason: z.enum([
+    FEEDBACK_REASON.FEASIBILITY_ISSUE,
+    FEEDBACK_REASON.INCOMPLETE,
+    FEEDBACK_REASON.DUPLICATE_IDEA,
+    FEEDBACK_REASON.IRRELEVANT,
+    FEEDBACK_REASON.OTHER,
+  ]),
 });
 
 export const ideaValidator = {
   createIdeaZodSchema,
+  updateIdeaStatusZodSchema,
 };

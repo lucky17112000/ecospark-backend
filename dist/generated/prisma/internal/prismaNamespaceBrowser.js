@@ -39,7 +39,16 @@ export const JsonNull = runtime.JsonNull;
  */
 export const AnyNull = runtime.AnyNull;
 export const ModelName = {
-    Category: 'Category'
+    User: 'User',
+    Session: 'Session',
+    Account: 'Account',
+    Verification: 'Verification',
+    Category: 'Category',
+    Feedback: 'Feedback',
+    Idea: 'Idea',
+    Payment: 'Payment',
+    Purchase: 'Purchase',
+    Vote: 'Vote'
 };
 /*
  * Enums
@@ -50,15 +59,133 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
     RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
 });
+export const UserScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    emailVerified: 'emailVerified',
+    role: 'role',
+    status: 'status',
+    needPasswordChange: 'needPasswordChange',
+    isDeleted: 'isDeleted',
+    deletedAt: 'deletedAt',
+    image: 'image',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const SessionScalarFieldEnum = {
+    id: 'id',
+    expiresAt: 'expiresAt',
+    token: 'token',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    userId: 'userId'
+};
+export const AccountScalarFieldEnum = {
+    id: 'id',
+    accountId: 'accountId',
+    providerId: 'providerId',
+    userId: 'userId',
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    idToken: 'idToken',
+    accessTokenExpiresAt: 'accessTokenExpiresAt',
+    refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+    scope: 'scope',
+    password: 'password',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const VerificationScalarFieldEnum = {
+    id: 'id',
+    identifier: 'identifier',
+    value: 'value',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
 export const CategoryScalarFieldEnum = {
     id: 'id',
     name: 'name'
+};
+export const FeedbackScalarFieldEnum = {
+    id: 'id',
+    ideaId: 'ideaId',
+    adminId: 'adminId',
+    message: 'message',
+    reason: 'reason',
+    isResolved: 'isResolved',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const IdeaScalarFieldEnum = {
+    id: 'id',
+    title: 'title',
+    problemStatement: 'problemStatement',
+    solutinon: 'solutinon',
+    description: 'description',
+    images: 'images',
+    authorId: 'authorId',
+    categoryId: 'categoryId',
+    status: 'status',
+    isPaid: 'isPaid',
+    price: 'price',
+    isDeleted: 'isDeleted',
+    deletedAt: 'deletedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const PaymentScalarFieldEnum = {
+    id: 'id',
+    ideaId: 'ideaId',
+    amount: 'amount',
+    transactionId: 'transactionId',
+    stripeEventId: 'stripeEventId',
+    status: 'status',
+    paymentDate: 'paymentDate',
+    inVoiceUrl: 'inVoiceUrl',
+    paymentGatewayData: 'paymentGatewayData',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    purchaseId: 'purchaseId',
+    userId: 'userId'
+};
+export const PurchaseScalarFieldEnum = {
+    id: 'id',
+    ideaId: 'ideaId',
+    userId: 'userId',
+    paymentStatus: 'paymentStatus',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+export const VoteScalarFieldEnum = {
+    id: 'id',
+    ideaId: 'ideaId',
+    userId: 'userId',
+    type: 'type',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 export const SortOrder = {
     asc: 'asc',
     desc: 'desc'
 };
+export const NullableJsonNullValueInput = {
+    DbNull: DbNull,
+    JsonNull: JsonNull
+};
 export const QueryMode = {
     default: 'default',
     insensitive: 'insensitive'
+};
+export const NullsOrder = {
+    first: 'first',
+    last: 'last'
+};
+export const JsonNullValueFilter = {
+    DbNull: DbNull,
+    JsonNull: JsonNull,
+    AnyNull: AnyNull
 };

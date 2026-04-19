@@ -7,4 +7,34 @@
 *
 * 🟢 You can import this file directly.
 */
-export {};
+export const Role = {
+    USER: 'USER',
+    ADMIN: 'ADMIN'
+};
+export const USER_STATUS = {
+    ACTIVE: 'ACTIVE',
+    BLOCKED: 'BLOCKED',
+    DELETED: 'DELETED'
+};
+export const IDEA_STATUS = {
+    UNDER_REVIEW: 'UNDER_REVIEW',
+    APPROVED: 'APPROVED',
+    REJECTED: 'REJECTED',
+    PUBLISHED: 'PUBLISHED',
+    ARCHIVED: 'ARCHIVED'
+};
+export const PaymentStatus = {
+    PAID: 'PAID',
+    UNPAID: 'UNPAID'
+};
+export const FEEDBACK_REASON = {
+    FEASIBILITY_ISSUE: 'FEASIBILITY_ISSUE',
+    INCOMPLETE: 'INCOMPLETE',
+    DUPLICATE_IDEA: 'DUPLICATE_IDEA',
+    IRRELEVANT: 'IRRELEVANT',
+    OTHER: 'OTHER'
+};
+export const VOTE_TYPE = {
+    UP: 'UP',
+    DOWN: 'DOWN'
+};

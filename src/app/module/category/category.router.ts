@@ -23,7 +23,11 @@ router.post(
 );
 // router.get("/", categoryController.getAllCategory);
 
-router.get("/", cheakAuth(Role.ADMIN), categoryController.getAllCategory);
+router.get(
+  "/",
+  // cheakAuth(Role.ADMIN, Role.USER),
+  categoryController.getAllCategory,
+);
 router.get("/:id", categoryController.getCategoryById);
 router.put(
   "/:id",

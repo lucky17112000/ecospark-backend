@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { authController } from "./auth.controller";
+import { cheakAuth } from "../../midddlware/cheakAuth";
+import { Role } from "../../../generated/prisma/enums";
+const router = Router();
+router.post("/register", authController.registerUser);
+router.post("/verify-email", authController.verifyEmail);
+router.post("/login", authController.logInUser);
+router.get("/me", cheakAuth(Role.ADMIN, Role.USER), authController.getMe);
+export const authRouter = router;

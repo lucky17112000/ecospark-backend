@@ -9,14 +9,21 @@ import { multerUpload } from "../../config/multer.config";
 const router = Router();
 router.post(
   "/",
-  cheakAuth(Role.USER),
+  cheakAuth(Role.USER, Role.ADMIN),
   multerUpload.array("files"),
   validateRequest(ideaValidator.createIdeaZodSchema),
   ideaController.createIdea,
 );
 router.get("/", ideaController.getAllIdeas);
 router.get("/:id", ideaController.getIdeayId);
-router.put("/:id", ideaController.updateIdea);
+// router.put("/:id", ideaController.updateIdea);
+
+router.put(
+  "/status",
+  cheakAuth(Role.ADMIN),
+  validateRequest(ideaValidator.updateIdeaStatusZodSchema),
+  ideaController.updateIdeaStatuswithFeedback,
+);
 router.delete("/:id", cheakAuth(Role.ADMIN), ideaController.deleteIdea);
 router.delete("/soft/:id", cheakAuth(Role.USER), ideaController.deleteIdeaSoft);
 

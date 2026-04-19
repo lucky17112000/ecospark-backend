@@ -20,6 +20,9 @@ export const globalErrorHandler = async (
   res: Response,
   next: NextFunction,
 ) => {
+  if (res.headersSent) {
+    return next(err);
+  }
   if (envVars.NODE_ENV === "development") {
     console.log("Error from Global Error Handler", err);
   }
@@ -100,5 +103,5 @@ export const globalErrorHandler = async (
     stack: envVars.NODE_ENV === "development" ? stack : undefined,
   };
 
-  res.status(statusCode).json(errorResponse);
+  return res.status(statusCode).json(errorResponse);
 };

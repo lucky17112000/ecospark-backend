@@ -225,6 +225,65 @@ const deleteIdeaSoft = async (id: string, user: IRequestUser) => {
   return result;
 };
 
+const getOneUserAllIdeas = async (userId: string, query: IQueryParams) => {};
+const updateIdeaStatusWithFeedback = async (
+  user: IRequestUser,
+  payload: any,
+) => {
+  if (user.role !== "ADMIN") {
+    throw new AppError(status.FORBIDDEN, "Only admin can update idea status");
+  }
+  const { ideaId, ideaStatus, message, reason } = payload;
+  if (!ideaId) {
+    throw new AppError(status.BAD_REQUEST, "ideaId is required");
+  }
+  if (!ideaStatus) {
+    throw new AppError(status.BAD_REQUEST, "ideaStatus is required");
+  }
+  if (!message) {
+    throw new AppError(status.BAD_REQUEST, "message is required");
+  }
+  if (!reason) {
+    throw new AppError(status.BAD_REQUEST, "reason is required");
+  }
+
+  const { idea, feedback } = await prisma.$transaction(async (tx) => {
+    const existingIdea = await tx.idea.findUnique({
+      where: { id: ideaId },
+      select: { id: true },
+    });
+
+    if (!existingIdea) {
+      throw new AppError(status.NOT_FOUND, "Idea not found");
+    }
+
+    const idea = await tx.idea.update({
+      where: { id: ideaId },
+      data: { status: ideaStatus },
+    });
+
+    // Feedback.ideaId is unique (one feedback per idea), so create-or-update.
+    const feedback = await tx.feedback.upsert({
+      where: { ideaId },
+      create: {
+        ideaId,
+        message,
+        reason,
+        adminId: user.userId,
+      },
+      update: {
+        message,
+        reason,
+        adminId: user.userId,
+      },
+    });
+
+    return { idea, feedback };
+  });
+
+  return { idea, feedback };
+};
+
 export const ideaService = {
   createIdea,
   getAllIdeas,
@@ -233,4 +292,6 @@ export const ideaService = {
   deleteIdea,
   deleteIdeaSoft,
   deleteByCornJobwhenSoftDeleted,
+  getOneUserAllIdeas,
+  updateIdeaStatusWithFeedback,
 };

@@ -1,0 +1,189 @@
+import status from "http-status";
+import AppError from "../../errorHelper.ts/AppError";
+import { prisma } from "../../lib/prisma";
+import { QueryBuilder } from "../../utiles/QueryBuilder";
+import { ideaFilterableFields, ideaIncludeConfig, ideaSearchableFields, } from "./idea.constant";
+const createIdea = async (payload) => {
+    const { title, problemStatement, solutinon, description, images, categoryId, authorId, price, } = payload;
+    const IdeaData = await prisma.idea.create({
+        data: {
+            title,
+            problemStatement,
+            solutinon,
+            description,
+            images,
+            categoryId,
+            authorId,
+            price,
+        },
+        include: {
+            author: true,
+            category: true,
+            votes: true,
+            feedback: true,
+            purchases: true,
+        },
+    });
+    return IdeaData;
+};
+const getAllIdeas = async (query) => {
+    // const ideas = await prisma.idea.findMany({
+    //   include: {
+    //     author: true,
+    //     category: true,
+    //     votes: true,
+    //     feedback: true,
+    //     purchases: true,
+    //   },
+    // });
+    // return ideas;
+    const normalizedQuery = { ...query };
+    // If `searchTerm` is a number (e.g. "10"), treat it as a price filter.
+    // This avoids Prisma "contains" errors on numeric fields and matches exact prices.
+    const searchTerm = normalizedQuery.searchTerm?.trim();
+    if (searchTerm && !Number.isNaN(Number(searchTerm))) {
+        normalizedQuery.price = searchTerm;
+        delete normalizedQuery.searchTerm;
+    }
+    const queryBuilder = new QueryBuilder(prisma.idea, normalizedQuery, {
+        searchableFields: ideaSearchableFields,
+        filterableFields: ideaFilterableFields,
+    });
+    const result = await queryBuilder
+        .search()
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+        .include({
+        author: true,
+        category: true,
+        votes: true,
+        feedback: true,
+        purchases: true,
+    })
+        .dynamicInclude(ideaIncludeConfig)
+        .execute();
+    return result;
+};
+const getIdeaById = async (id) => {
+    const idea = await prisma.idea.findUnique({
+        where: { id },
+        include: {
+            author: true,
+            category: true,
+            votes: true,
+            feedback: true,
+            purchases: true,
+        },
+    });
+    return idea;
+};
+const updateIdea = async (id, payload) => {
+    const data = payload;
+    const dataById = await prisma.idea.findUnique({
+        where: { id },
+    });
+    if (!dataById) {
+        throw new AppError(status.NOT_FOUND, "Idea not found");
+    }
+    const idea = await prisma.idea.update({
+        where: { id },
+        data,
+        include: {
+            author: true,
+            category: true,
+            votes: true,
+            feedback: true,
+            purchases: true,
+        },
+    });
+    return idea;
+};
+const deleteIdea = async (id, user) => {
+    if (!id) {
+        throw new AppError(status.BAD_REQUEST, "Idea id is required");
+    }
+    const dataById = await prisma.idea.findUnique({
+        where: { id },
+        select: {
+            isDeleted: true,
+            author: {
+                select: {
+                    role: true,
+                    email: true,
+                },
+            },
+        },
+    });
+    if (!dataById) {
+        throw new AppError(status.NOT_FOUND, "Idea not found");
+    }
+    if (!dataById.isDeleted) {
+        throw new AppError(status.BAD_REQUEST, "Idea is not deleted yet");
+    }
+    //   if (dataById?.author.email !== user.email) {
+    //     throw new AppError(
+    //       status.FORBIDDEN,
+    //       "You are not authorized to delete this idea",
+    //     );
+    //   }
+    if (user.role !== "ADMIN") {
+        throw new AppError(status.FORBIDDEN, "Only admin can delete this idea permanently");
+    }
+    const result = await prisma.idea.delete({
+        where: { id },
+    });
+    return result;
+};
+const deleteByCornJobwhenSoftDeleted = async () => {
+    const result = await prisma.idea.deleteMany({
+        where: {
+            isDeleted: true,
+            deletedAt: {
+                lt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // Soft deleted for more than 1 day
+            },
+        },
+    });
+    const deletedCount = result.count || 0;
+    return {
+        message: `${deletedCount} soft deleted ideas that were marked for deletion more than 1 day ago have been permanently removed.`,
+    };
+};
+const deleteIdeaSoft = async (id, user) => {
+    if (!id) {
+        throw new AppError(status.BAD_REQUEST, "Idea id is required");
+    }
+    const dataById = await prisma.idea.findUnique({
+        where: { id },
+        select: { id: true, isDeleted: true, authorId: true },
+    });
+    if (!dataById) {
+        throw new AppError(status.NOT_FOUND, "Idea not found");
+    }
+    if (dataById.authorId !== user.userId) {
+        throw new AppError(status.FORBIDDEN, "You are not authorized to delete this idea");
+    }
+    if (dataById?.isDeleted) {
+        throw new AppError(status.BAD_REQUEST, "Idea is already get permission for deleted");
+    }
+    const result = await prisma.idea.update({
+        where: { id },
+        data: {
+            isDeleted: true,
+            deletedAt: new Date(),
+        },
+    });
+    return result;
+};
+const getOneUserAllIdeas = async (userId, query) => { };
+export const ideaService = {
+    createIdea,
+    getAllIdeas,
+    getIdeaById,
+    updateIdea,
+    deleteIdea,
+    deleteIdeaSoft,
+    deleteByCornJobwhenSoftDeleted,
+    getOneUserAllIdeas,
+};
