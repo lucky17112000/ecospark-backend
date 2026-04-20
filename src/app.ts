@@ -11,6 +11,7 @@ import AppError from "./app/errorHelper.ts/AppError";
 import status from "http-status";
 import { globalErrorHandler } from "./app/midddlware/globalErrorHandler";
 import { notFound } from "./app/midddlware/notFound";
+import { authService } from "./app/module/auth/auth.service";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +42,16 @@ cron.schedule("*/30 * * * *", async () => {
   try {
     console.log("Running cron job to update idea status...");
     await ideaService.deleteByCornJobwhenSoftDeleted();
+  } catch (error) {
+    console.error("Error running cron job:", error);
+  }
+});
+
+// Every 2 minutes (node-cron supports a 6-field format: second minute hour day month weekDay)
+cron.schedule("*/2 * * * *", async () => {
+  try {
+    console.log("Running cron job to delete unverified users...");
+    await authService.userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes();
   } catch (error) {
     console.error("Error running cron job:", error);
   }

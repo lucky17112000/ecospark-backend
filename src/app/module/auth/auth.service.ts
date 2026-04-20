@@ -135,10 +135,24 @@ const verifyEmail = async (email: string, otp: string) => {
     });
   }
 };
+
+const userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes =
+  async () => {
+    await prisma.user.deleteMany({
+      where: {
+        emailVerified: false,
+        createdAt: {
+          lt: new Date(Date.now() - 2 * 60 * 1000), // Created more than 2 minutes ago
+        },
+      },
+    });
+    return { success: true, message: "Unverified users deleted successfully" };
+  };
 export const authService = {
   registrationUser,
   logInUser,
   getMe,
   changePassword,
   verifyEmail,
+  userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes,
 };
