@@ -99,6 +99,25 @@ const deleteIdeaSoft = async (req: Request, res: Response) => {
     data: result,
   });
 };
+const deleteIdeaSoftByAdmin = async (req: Request, res: Response) => {
+  const { id } = req.body;
+  if (!id) {
+    throw new AppError(status.BAD_REQUEST, "Idea id is required");
+  }
+  if (!req.user) {
+    throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+  }
+  const result = await ideaService.deleteIdeaSoftByAdmin(
+    id as string,
+    req.user as IRequestUser,
+  );
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Idea soft deleted successfully by admin",
+    data: result,
+  });
+};
 
 const updateIdeaStatuswithFeedback = catchasync(
   async (req: Request, res: Response) => {
@@ -128,4 +147,5 @@ export const ideaController = {
   deleteIdea,
   deleteIdeaSoft,
   updateIdeaStatuswithFeedback,
+  deleteIdeaSoftByAdmin,
 };

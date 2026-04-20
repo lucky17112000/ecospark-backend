@@ -178,7 +178,7 @@ const deleteByCornJobwhenSoftDeleted = async () => {
     where: {
       isDeleted: true,
       deletedAt: {
-        lt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // Soft deleted for more than 1 day
+        lt: new Date(Date.now() - 1 * 60 * 60 * 1000), // Soft deleted for more than 1 day
       },
     },
   });
@@ -202,12 +202,12 @@ const deleteIdeaSoft = async (id: string, user: IRequestUser) => {
     throw new AppError(status.NOT_FOUND, "Idea not found");
   }
 
-  if (dataById.authorId !== user.userId) {
-    throw new AppError(
-      status.FORBIDDEN,
-      "You are not authorized to delete this idea",
-    );
-  }
+  // if (user.userId !== dataById.authorId) {
+  //   throw new AppError(
+  //     status.FORBIDDEN,
+  //     "You are not authorized to delete this idea",
+  //   );
+  // }
   if (dataById?.isDeleted) {
     throw new AppError(
       status.BAD_REQUEST,
@@ -284,6 +284,33 @@ const updateIdeaStatusWithFeedback = async (
   return { idea, feedback };
 };
 
+const deleteIdeaSoftByAdmin = async (id: string, user: IRequestUser) => {
+  if (!id) {
+    throw new AppError(status.BAD_REQUEST, "Idea id is required");
+  }
+  if (user.role !== "ADMIN") {
+    throw new AppError(status.FORBIDDEN, "Only admin can delete this idea");
+  }
+  const dataById = await prisma.idea.findUnique({
+    where: { id },
+    select: { id: true, isDeleted: true },
+  });
+  if (!dataById) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  if (dataById?.isDeleted) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Idea is already get permission for deleted",
+    );
+  }
+  const result = await prisma.idea.update({
+    where: { id },
+    data: { isDeleted: true, deletedAt: new Date() },
+  });
+  return result;
+};
+
 export const ideaService = {
   createIdea,
   getAllIdeas,
@@ -294,4 +321,5 @@ export const ideaService = {
   deleteByCornJobwhenSoftDeleted,
   getOneUserAllIdeas,
   updateIdeaStatusWithFeedback,
+  deleteIdeaSoftByAdmin,
 };

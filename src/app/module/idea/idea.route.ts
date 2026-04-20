@@ -24,7 +24,13 @@ router.put(
   validateRequest(ideaValidator.updateIdeaStatusZodSchema),
   ideaController.updateIdeaStatuswithFeedback,
 );
-router.delete("/:id", cheakAuth(Role.ADMIN), ideaController.deleteIdea);
-router.delete("/soft/:id", cheakAuth(Role.USER), ideaController.deleteIdeaSoft);
+// router.delete("/:id", cheakAuth(Role.ADMIN), ideaController.deleteIdea);
+// router.delete("/soft/:id", ideaController.deleteIdeaSoft);
+router.delete("/soft", cheakAuth(Role.ADMIN), ideaController.deleteIdeaSoft);
+router.delete(
+  "/soft/by-admin",
+  cheakAuth(Role.ADMIN),
+  ideaController.deleteIdeaSoftByAdmin,
+);
 
 export const ideaRouter = router;
