@@ -5,6 +5,7 @@ import status from "http-status";
 dotenv.config();
 const loadEnvVariables = () => {
     const requiredEnvVars = [
+        "PORT",
         "DATABASE_URL",
         "BETTER_AUTH_SECRET",
         "BETTER_AUTH_URL",
@@ -33,7 +34,7 @@ const loadEnvVariables = () => {
     });
     return {
         NODE_ENV: process.env.NODE_ENV,
-        PORT: (process.env.PORT || "5000"),
+        PORT: process.env.PORT,
         DATABASE_URL: process.env.DATABASE_URL,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
         BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,

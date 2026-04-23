@@ -55,7 +55,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    oAuthProxy(),
+    // oAuthProxy(),
     bearer(),
     emailOTP({
       overrideDefaultEmailVerification: true,
@@ -108,25 +108,26 @@ export const auth = betterAuth({
   },
 
   advanced: {
-    // disableCSRFCheck: true,
-    useSecureCookies: false,
     cookies: {
-      state: {
+      session_token: {
+        name: "session_token", // Force this exact name
         attributes: {
-          sameSite: "none",
-          secure: true,
           httpOnly: true,
-          path: "/",
+          secure: true,
+          sameSite: "none",
+          partitioned: true,
         },
       },
-      sessionToken: {
+      state: {
+        name: "session_token", // Force this exact name
         attributes: {
-          sameSite: "none",
-          secure: true,
           httpOnly: true,
-          path: "/",
+          secure: true,
+          sameSite: "none",
+          partitioned: true,
         },
       },
     },
   },
+  //  plugins: [oAuthProxy()],
 });
