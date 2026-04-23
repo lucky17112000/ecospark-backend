@@ -12,7 +12,7 @@ export interface IcreateIdeaPayload {
 }
 */
 import z from "zod";
-import { FEEDBACK_REASON, IDEA_STATUS } from "../../../generated/prisma/enums";
+import { FEEDBACK_REASON, IDEA_STATUS } from "../../../generated/prisma/enums.js";
 const createIdeaZodSchema = z.object({
     title: z.string().min(5, "Title must be at least 5 characters long"),
     problemStatement: z

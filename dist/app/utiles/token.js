@@ -1,6 +1,6 @@
-import { jwtUtils } from "./jwt";
-import { envVars } from "../config/env";
-import { cookieUtil } from "./cookie";
+import { jwtUtils } from "./jwt.js";
+import { envVars } from "../config/env.js";
+import { cookieUtil } from "./cookie.js";
 const getAccessToken = (payload) => {
     const accessToken = jwtUtils.createToken(payload, envVars.ACCESS_TOKEN_SECRET, { expiresIn: envVars.ACCESS_TOKEN_EXPIRES_IN });
     return accessToken;

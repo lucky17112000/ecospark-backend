@@ -1,7 +1,7 @@
-import { catchasync } from "../../../shared/cathAsync";
-import { voteService } from "./vote.service";
-import { sendResponse } from "../../../shared/sendResponse";
-import AppError from "../../errorHelper.ts/AppError";
+import { catchasync } from "../../../shared/cathAsync.js";
+import { voteService } from "./vote.service.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
+import AppError from "../../errorHelper.ts/AppError.js";
 import status from "http-status";
 const createVote = catchasync(async (req, res) => {
     console.log("ideaId in controller:", req.body.ideaId);

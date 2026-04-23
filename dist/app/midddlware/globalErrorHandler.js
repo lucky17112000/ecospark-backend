@@ -1,9 +1,9 @@
 import status from "http-status";
 import z from "zod";
-import { handleZodError } from "../errorHelper.ts/HandleZodError";
-import AppError from "../errorHelper.ts/AppError";
-import { envVars } from "../config/env";
-import { deleteFileFromCloudinary } from "../config/cloudinary.config";
+import { handleZodError } from "../errorHelper.ts/HandleZodError.js";
+import AppError from "../errorHelper.ts/AppError.js";
+import { envVars } from "../config/env.js";
+import { deleteFileFromCloudinary } from "../config/cloudinary.config.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const globalErrorHandler = async (err, req, res, next) => {
     if (res.headersSent) {

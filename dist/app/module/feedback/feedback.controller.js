@@ -1,8 +1,8 @@
-import { catchasync } from "../../../shared/cathAsync";
-import AppError from "../../errorHelper.ts/AppError";
+import { catchasync } from "../../../shared/cathAsync.js";
+import AppError from "../../errorHelper.ts/AppError.js";
 import status from "http-status";
-import { feedbackService } from "./feedback.services";
-import { sendResponse } from "../../../shared/sendResponse";
+import { feedbackService } from "./feedback.services.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 const createFeedback = catchasync(async (req, res) => {
     const data = req.body;
     const user = req.user;

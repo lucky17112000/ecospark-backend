@@ -1,11 +1,10 @@
 import dotenv from "dotenv";
-import AppError from "../errorHelper.ts/AppError";
+import AppError from "../errorHelper.ts/AppError.js";
 import status from "http-status";
 // import e from "express";
 dotenv.config();
 const loadEnvVariables = () => {
     const requiredEnvVars = [
-        "PORT",
         "DATABASE_URL",
         "BETTER_AUTH_SECRET",
         "BETTER_AUTH_URL",
@@ -34,7 +33,7 @@ const loadEnvVariables = () => {
     });
     return {
         NODE_ENV: process.env.NODE_ENV,
-        PORT: process.env.PORT,
+        PORT: (process.env.PORT || "5000"),
         DATABASE_URL: process.env.DATABASE_URL,
         BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
         BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,

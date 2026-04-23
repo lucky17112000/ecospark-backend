@@ -1,9 +1,9 @@
-import { catchasync } from "../../../shared/cathAsync";
-import { authService } from "./auth.service";
-import { sendResponse } from "../../../shared/sendResponse";
+import { catchasync } from "../../../shared/cathAsync.js";
+import { authService } from "./auth.service.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 import status from "http-status";
-import { tokenUtil } from "../../utiles/token";
-import AppError from "../../errorHelper.ts/AppError";
+import { tokenUtil } from "../../utiles/token.js";
+import AppError from "../../errorHelper.ts/AppError.js";
 const registerUser = catchasync(async (req, res) => {
     const payload = req.body;
     const result = await authService.registrationUser(payload);

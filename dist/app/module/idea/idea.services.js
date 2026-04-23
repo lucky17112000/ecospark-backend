@@ -1,8 +1,8 @@
 import status from "http-status";
-import AppError from "../../errorHelper.ts/AppError";
-import { prisma } from "../../lib/prisma";
-import { QueryBuilder } from "../../utiles/QueryBuilder";
-import { ideaFilterableFields, ideaIncludeConfig, ideaSearchableFields, } from "./idea.constant";
+import AppError from "../../errorHelper.ts/AppError.js";
+import { prisma } from "../../lib/prisma.js";
+import { QueryBuilder } from "../../utiles/QueryBuilder.js";
+import { ideaFilterableFields, ideaIncludeConfig, ideaSearchableFields, } from "./idea.constant.js";
 const createIdea = async (payload) => {
     const { title, problemStatement, solutinon, description, images, categoryId, authorId, price, } = payload;
     const IdeaData = await prisma.idea.create({

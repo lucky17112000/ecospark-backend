@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { categoryController } from "./category.controller";
-import { validateRequest } from "../../midddlware/validateRequest";
-import { createDoctorZodSchema, updateDoctorZodSchema, } from "./category.validate";
-import { cheakAuth } from "../../midddlware/cheakAuth";
-import { Role } from "../../../generated/prisma/enums";
+import { categoryController } from "./category.controller.js";
+import { validateRequest } from "../../midddlware/validateRequest.js";
+import { createDoctorZodSchema, updateDoctorZodSchema, } from "./category.validate.js";
+import { cheakAuth } from "../../midddlware/cheakAuth.js";
+import { Role } from "../../../generated/prisma/enums.js";
 const router = Router();
 router.post("/", cheakAuth(Role.ADMIN), validateRequest(createDoctorZodSchema), categoryController.createCategory);
 // router.get("/", categoryController.getAllCategory);

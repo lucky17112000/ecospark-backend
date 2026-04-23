@@ -1,9 +1,9 @@
 import status from "http-status";
-import { catchasync } from "../../../shared/cathAsync";
-import { envVars } from "../../config/env";
-import { stripe } from "../../config/stripe.config";
-import { PaymentService } from "./payment.service";
-import { sendResponse } from "../../../shared/sendResponse";
+import { catchasync } from "../../../shared/cathAsync.js";
+import { envVars } from "../../config/env.js";
+import { stripe } from "../../config/stripe.config.js";
+import { PaymentService } from "./payment.service.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 const handleStripeWebhookEvent = catchasync(async (req, res) => {
     const signature = req.headers["stripe-signature"];
     const webHookSecret = envVars.STRIPE.STRIPE_WEBHOOK_SECRET;

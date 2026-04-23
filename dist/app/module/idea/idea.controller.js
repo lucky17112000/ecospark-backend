@@ -1,8 +1,8 @@
-import { ideaService } from "./idea.services";
-import { sendResponse } from "../../../shared/sendResponse";
+import { ideaService } from "./idea.services.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 import status from "http-status";
-import AppError from "../../errorHelper.ts/AppError";
-import { catchasync } from "../../../shared/cathAsync";
+import AppError from "../../errorHelper.ts/AppError.js";
+import { catchasync } from "../../../shared/cathAsync.js";
 const createIdea = async (req, res) => {
     // console.log("Request body:", req.body);
     console.log("Request files:", req.files);

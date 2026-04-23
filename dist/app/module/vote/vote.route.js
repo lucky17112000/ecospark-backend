@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { voteController } from "./vote.controller";
-import { cheakAuth } from "../../midddlware/cheakAuth";
-import { Role } from "../../../generated/prisma/enums";
+import { voteController } from "./vote.controller.js";
+import { cheakAuth } from "../../midddlware/cheakAuth.js";
+import { Role } from "../../../generated/prisma/enums.js";
 const router = Router();
 router.post("/", cheakAuth(Role.USER, Role.ADMIN), voteController.createVote);
 router.get("/upvotes/:id", voteController.countUpVotes);

@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { ideaController } from "./idea.controller";
-import { validateRequest } from "../../midddlware/validateRequest";
-import { ideaValidator } from "./idea.valiators";
-import { cheakAuth } from "../../midddlware/cheakAuth";
-import { Role } from "../../../generated/prisma/enums";
-import { multerUpload } from "../../config/multer.config";
+import { ideaController } from "./idea.controller.js";
+import { validateRequest } from "../../midddlware/validateRequest.js";
+import { ideaValidator } from "./idea.valiators.js";
+import { cheakAuth } from "../../midddlware/cheakAuth.js";
+import { Role } from "../../../generated/prisma/enums.js";
+import { multerUpload } from "../../config/multer.config.js";
 const router = Router();
 router.post("/", multerUpload.array("files"), validateRequest(ideaValidator.createIdeaZodSchema), ideaController.createIdea);
 //  cheakAuth(Role.USER, Role.ADMIN),

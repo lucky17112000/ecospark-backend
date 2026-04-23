@@ -1,10 +1,10 @@
-import { USER_STATUS } from "../../generated/prisma/enums";
-import { cookieUtil } from "../utiles/cookie";
-import AppError from "../errorHelper.ts/AppError";
+import { USER_STATUS } from "../../generated/prisma/enums.js";
+import { cookieUtil } from "../utiles/cookie.js";
+import AppError from "../errorHelper.ts/AppError.js";
 import status from "http-status";
-import { prisma } from "../lib/prisma";
-import { jwtUtils } from "../utiles/jwt";
-import { envVars } from "../config/env";
+import { prisma } from "../lib/prisma.js";
+import { jwtUtils } from "../utiles/jwt.js";
+import { envVars } from "../config/env.js";
 export const cheakAuth = (...authRoles) => async (req, res, next) => {
     try {
         const sessionToken = cookieUtil.getCookie(req, "better-auth.session_token");

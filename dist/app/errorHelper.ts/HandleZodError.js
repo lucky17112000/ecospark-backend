@@ -1,5 +1,5 @@
 import status from "http-status";
-// import { TErrorResponse, TErrorSources } from "../interfaces/error.interface";
+// import { TErrorResponse, TErrorSources } from "../interfaces/error.interface.js";
 export const handleZodError = (err) => {
     const statusCode = status.BAD_REQUEST;
     const message = "Zod Validation Error";

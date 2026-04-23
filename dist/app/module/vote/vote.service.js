@@ -1,6 +1,6 @@
 import status from "http-status";
-import AppError from "../../errorHelper.ts/AppError";
-import { prisma } from "../../lib/prisma";
+import AppError from "../../errorHelper.ts/AppError.js";
+import { prisma } from "../../lib/prisma.js";
 const createVote = async (payload, user) => {
     const { type } = payload;
     const dataFromIdeaId = await prisma.idea.findUnique({

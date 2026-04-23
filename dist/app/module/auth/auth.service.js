@@ -1,12 +1,12 @@
 import status from "http-status";
-import AppError from "../../errorHelper.ts/AppError";
-import { auth } from "../../lib/auth";
-import { Role, USER_STATUS } from "../../../generated/prisma/enums";
-import { prisma } from "../../lib/prisma";
-import { tokenUtil } from "../../utiles/token";
+import AppError from "../../errorHelper.ts/AppError.js";
+import { auth } from "../../lib/auth.js";
+import { Role, USER_STATUS } from "../../../generated/prisma/enums.js";
+import { prisma } from "../../lib/prisma.js";
+import { tokenUtil } from "../../utiles/token.js";
 // import { setTokenUtil } from "better-auth/oauth2";
-import { envVars } from "../../config/env";
-import { jwtUtils } from "../../utiles/jwt";
+import { envVars } from "../../config/env.js";
+import { jwtUtils } from "../../utiles/jwt.js";
 const registrationUser = async (payload) => {
     const { name, email, password, role } = payload;
     const normalizedRole = typeof role === "string" ? role.toUpperCase() : role;

@@ -1,8 +1,8 @@
-import { catchasync } from "../../../shared/cathAsync";
-import AppError from "../../errorHelper.ts/AppError";
+import { catchasync } from "../../../shared/cathAsync.js";
+import AppError from "../../errorHelper.ts/AppError.js";
 import status from "http-status";
-import { adminService } from "./admin.service";
-import { sendResponse } from "../../../shared/sendResponse";
+import { adminService } from "./admin.service.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 const getAllUsersByAdmin = catchasync(async (req, res) => {
     if (!req.user) {
         throw new AppError(status.UNAUTHORIZED, "Unauthorized");

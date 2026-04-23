@@ -1,8 +1,8 @@
-import { catchasync } from "../../../shared/cathAsync";
-import AppError from "../../errorHelper.ts/AppError";
+import { catchasync } from "../../../shared/cathAsync.js";
+import AppError from "../../errorHelper.ts/AppError.js";
 import status from "http-status";
-import { purchaseService } from "./purchase.service";
-import { sendResponse } from "../../../shared/sendResponse";
+import { purchaseService } from "./purchase.service.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 const createPurchase = catchasync(async (req, res) => {
     const data = req.body;
     if (!req.user) {

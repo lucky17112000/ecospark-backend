@@ -1,8 +1,8 @@
-import { prisma } from "../../lib/prisma";
-import { PaymentStatus } from "../../../generated/prisma/enums";
-// import { generateInvoicePdf } from "./payment.utiles";
-// import { uploadFileToCloudinary } from "../../../config/cloudinary.config";
-// import { sendEmail } from "../../utiles/email";
+import { prisma } from "../../lib/prisma.js";
+import { PaymentStatus } from "../../../generated/prisma/enums.js";
+// import { generateInvoicePdf } from "./payment.utiles.js";
+// import { uploadFileToCloudinary } from "../../../config/cloudinary.config.js";
+// import { sendEmail } from "../../utiles/email.js";
 const handleStripeWebhookEvent = async (event) => {
     //!SECTION
     const existingPayment = await prisma.payment.findFirst({

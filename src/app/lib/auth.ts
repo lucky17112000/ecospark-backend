@@ -3,9 +3,10 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 
 import { prisma } from "./prisma";
 import { Role, USER_STATUS } from "../../generated/prisma/enums";
-import { bearer, emailOTP } from "better-auth/plugins";
+import { bearer, emailOTP, oAuthProxy, openAPI } from "better-auth/plugins";
 import { tr } from "zod/locales";
 import { sendEmail } from "../utiles/email";
+import { envVars } from "../config/env";
 // If your Prisma file is located elsewhere, you can change the path
 // import { PrismaClient } from "@/generated/prisma/client";
 
@@ -13,6 +14,8 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql", // or "mysql", "postgresql", ...etc
   }),
+  baseURL: envVars.FRONTEND_URL,
+  trustedOrigins: [envVars.FRONTEND_URL!],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -52,6 +55,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    oAuthProxy(),
     bearer(),
     emailOTP({
       overrideDefaultEmailVerification: true,
@@ -62,10 +66,11 @@ export const auth = betterAuth({
           });
 
           if (user) {
-            sendEmail({
+            await sendEmail({
               to: email,
               subject: "Verify your email",
-              templateName: "otp",
+              templateName: "otp", //for deployment
+              // templateName: "otp",
               templateData: {
                 name: user.name,
                 otp,
@@ -77,7 +82,7 @@ export const auth = betterAuth({
             where: { email },
           });
           if (user) {
-            sendEmail({
+            await sendEmail({
               to: email,
               subject: "Reset your password",
               templateName: "password-reset",

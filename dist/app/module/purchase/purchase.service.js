@@ -1,9 +1,9 @@
 import status from "http-status";
-import AppError from "../../errorHelper.ts/AppError";
-import { prisma } from "../../lib/prisma";
+import AppError from "../../errorHelper.ts/AppError.js";
+import { prisma } from "../../lib/prisma.js";
 import { randomUUID } from "node:crypto";
-import { stripe } from "../../config/stripe.config";
-import { envVars } from "../../config/env";
+import { stripe } from "../../config/stripe.config.js";
+import { envVars } from "../../config/env.js";
 const createPurchase = async (payload, user) => {
     const { ideaId } = payload;
     const ideaData = await prisma.idea.findUnique({

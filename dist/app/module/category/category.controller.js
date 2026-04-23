@@ -1,6 +1,6 @@
-import { catchasync } from "../../../shared/cathAsync";
-import { categoryService } from "./category.service";
-import { sendResponse } from "../../../shared/sendResponse";
+import { catchasync } from "../../../shared/cathAsync.js";
+import { categoryService } from "./category.service.js";
+import { sendResponse } from "../../../shared/sendResponse.js";
 import status from "http-status";
 const createCategory = catchasync(async (req, res) => {
     const category = await categoryService.createcategory(req.body);

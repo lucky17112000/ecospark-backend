@@ -1,7 +1,7 @@
 import status from "http-status";
-import AppError from "../../errorHelper.ts/AppError";
-import { prisma } from "../../lib/prisma";
-import { QueryBuilder } from "../../utiles/QueryBuilder";
+import AppError from "../../errorHelper.ts/AppError.js";
+import { prisma } from "../../lib/prisma.js";
+import { QueryBuilder } from "../../utiles/QueryBuilder.js";
 const getAllUsersByAdmn = async (user, query = {}) => {
     if (user.role !== "ADMIN") {
         throw new AppError(status.FORBIDDEN, "Only admins can access this resource");
