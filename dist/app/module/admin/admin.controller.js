@@ -44,8 +44,22 @@ const getOneUserByAdmin = catchasync(async (req, res) => {
         message: "User retrieved successfully",
     });
 });
+const hardDeleteUserByAdmin = catchasync(async (req, res) => {
+    if (!req.user) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+    }
+    const { userId } = req.params;
+    const result = await adminService.hardDeleteUserByAdmin(userId, req.user);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        data: result,
+        message: "User deleted successfully",
+    });
+});
 export const adminController = {
     getAllUsersByAdmin,
     updateUserRoleByAdmin,
     getOneUserByAdmin,
+    hardDeleteUserByAdmin,
 };

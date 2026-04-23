@@ -1,10 +1,10 @@
 import status from "http-status";
 import AppError from "../../errorHelper.ts/AppError";
 import { prisma } from "../../lib/prisma";
-const createVote = async (payload, user, ideaId) => {
+const createVote = async (payload, user) => {
     const { type } = payload;
     const dataFromIdeaId = await prisma.idea.findUnique({
-        where: { id: ideaId },
+        where: { id: payload.ideaId },
         include: {
             votes: true,
             author: true,
@@ -29,7 +29,7 @@ const createVote = async (payload, user, ideaId) => {
     }
     const result = await prisma.vote.create({
         data: {
-            ideaId,
+            ideaId: payload.ideaId,
             type,
             userId: user.userId,
         },

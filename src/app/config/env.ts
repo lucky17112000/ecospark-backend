@@ -18,6 +18,7 @@ interface EnvConfig {
   PORT: string;
   DATABASE_URL: string;
   BETTER_AUTH_SECRET: string;
+  REFRESH_TOKEN_SECRET: string;
   BETTER_AUTH_URL: string;
   ACCESS_TOKEN_SECRET: string;
   ACCESS_TOKEN_EXPIRES_IN: string;
@@ -61,6 +62,7 @@ const loadEnvVariables = (): EnvConfig => {
     "CLOUDINARY_CLOUD_NAME",
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_API_SECRET",
+    "REFRESH_TOKEN_SECRET",
   ];
   requiredEnvVars.forEach((variable: string) => {
     if (!process.env[variable]) {
@@ -98,6 +100,7 @@ const loadEnvVariables = (): EnvConfig => {
       CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
     },
     FRONTEND_URL: process.env.FRONTEND_URL as string,
+    REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET as string,
   };
 };
 export const envVars = loadEnvVariables();

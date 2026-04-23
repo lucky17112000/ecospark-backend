@@ -64,7 +64,7 @@ const createPurchase = async (payload, user) => {
             purchaseId: result.id,
             paymentId: paymentData.id,
         },
-        success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success`,
+        success_url: `${envVars.FRONTEND_URL}/dashboard/`,
         cancel_url: `${envVars.FRONTEND_URL}/dashboard/purchase`,
     });
     return {
@@ -77,7 +77,7 @@ const createPurchase = async (payload, user) => {
 const getAllPurchases = async () => {
     const result = await prisma.purchase.findMany({
         include: {
-            idea: true,
+            // idea: true,
             user: true,
         },
     });

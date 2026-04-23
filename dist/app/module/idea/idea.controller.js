@@ -2,6 +2,7 @@ import { ideaService } from "./idea.services";
 import { sendResponse } from "../../../shared/sendResponse";
 import status from "http-status";
 import AppError from "../../errorHelper.ts/AppError";
+import { catchasync } from "../../../shared/cathAsync";
 const createIdea = async (req, res) => {
     // console.log("Request body:", req.body);
     console.log("Request files:", req.files);
@@ -84,6 +85,36 @@ const deleteIdeaSoft = async (req, res) => {
         data: result,
     });
 };
+const deleteIdeaSoftByAdmin = async (req, res) => {
+    const { id } = req.body;
+    if (!id) {
+        throw new AppError(status.BAD_REQUEST, "Idea id is required");
+    }
+    if (!req.user) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+    }
+    const result = await ideaService.deleteIdeaSoftByAdmin(id, req.user);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        message: "Idea soft deleted successfully by admin",
+        data: result,
+    });
+};
+const updateIdeaStatuswithFeedback = catchasync(async (req, res) => {
+    const id = req.user;
+    const data = req.body;
+    if (!id) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+    }
+    const result = await ideaService.updateIdeaStatusWithFeedback(id, data);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        message: "Idea status updated successfully",
+        data: result,
+    });
+});
 export const ideaController = {
     createIdea,
     getAllIdeas,
@@ -91,4 +122,6 @@ export const ideaController = {
     updateIdea,
     deleteIdea,
     deleteIdeaSoft,
+    updateIdeaStatuswithFeedback,
+    deleteIdeaSoftByAdmin,
 };

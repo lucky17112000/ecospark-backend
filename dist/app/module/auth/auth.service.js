@@ -4,6 +4,9 @@ import { auth } from "../../lib/auth";
 import { Role, USER_STATUS } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { tokenUtil } from "../../utiles/token";
+// import { setTokenUtil } from "better-auth/oauth2";
+import { envVars } from "../../config/env";
+import { jwtUtils } from "../../utiles/jwt";
 const registrationUser = async (payload) => {
     const { name, email, password, role } = payload;
     const normalizedRole = typeof role === "string" ? role.toUpperCase() : role;
@@ -97,8 +100,101 @@ const getMe = async (user) => {
     }
     return existingUser;
 };
-const changePassword = async (payload) => {
+const getNewToken = async (refreshToken, sessionToken) => {
+    //exiting session token er time barate hobe new session token amader die make kora possible na karon session token ase better auth theke but amra time barai dite pari
+    //manually session token getting proccess  change passsword e  better auth er away te access kora hoyece so duitai same kaj kore
+    const isSessonTokenExists = await prisma.session.findUnique({
+        where: {
+            token: sessionToken,
+        },
+        include: {
+            user: true,
+        },
+    });
+    if (!isSessonTokenExists) {
+        throw new AppError(status.UNAUTHORIZED, "User is not logged in");
+    }
+    const verifiedRefreshToken = jwtUtils.verifyToken(refreshToken, envVars.REFRESH_TOKEN_SECRET);
+    if (!verifiedRefreshToken) {
+        throw new AppError(status.UNAUTHORIZED, "Invalid refresh token");
+    }
+    const data = verifiedRefreshToken.data;
+    const newAccessToken = tokenUtil.getAccessToken({
+        userId: data.id,
+        role: data.role,
+        name: data.name,
+        email: data.email,
+        emailVerified: data.emailVerified,
+        status: data.status,
+        isDeleted: data.isDeleted,
+    });
+    const newRefreshToken = tokenUtil.getRefreshToken({
+        userId: data.id,
+        role: data.role,
+        name: data.name,
+        email: data.email,
+        emailVerified: data.emailVerified,
+        status: data.status,
+        isDeleted: data.isDeleted,
+    });
+    const updatedSession = await prisma.session.update({
+        where: {
+            token: sessionToken,
+        },
+        data: {
+            token: sessionToken,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), //! 1 days
+            updatedAt: new Date(),
+        },
+    });
+    //!SECTION end
+    return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        sessionToken: updatedSession.token,
+    };
+};
+const changePassword = async (payload, sessionToken) => {
     // const session  =
+    const sesison = await auth.api.getSession({
+        headers: {
+            Authorization: `Bearer ${sessionToken}`,
+        },
+    });
+    if (!sesison) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+    }
+    const { currentPassword, newPassword } = payload;
+    const result = await auth.api.changePassword({
+        body: {
+            currentPassword,
+            newPassword,
+        },
+        headers: {
+            Authorization: `Bearer ${sessionToken}`,
+        },
+    });
+    // return result;
+    return { success: true, message: "Password changed successfully" };
+};
+const forgetPassword = async (email) => {
+    const isUserExists = await prisma.user.findUnique({
+        where: { email },
+    });
+    if (!isUserExists) {
+        throw new AppError(status.NOT_FOUND, "User not found");
+    }
+    if (!isUserExists.emailVerified) {
+        throw new AppError(status.BAD_REQUEST, "Email is not verified");
+    }
+    if (isUserExists.status === USER_STATUS.DELETED) {
+        throw new AppError(status.BAD_REQUEST, "User is deleted");
+    }
+    await auth.api.requestPasswordResetEmailOTP({
+        body: {
+            email,
+        },
+    });
 };
 const verifyEmail = async (email, otp) => {
     const result = await auth.api.verifyEmailOTP({
@@ -114,10 +210,24 @@ const verifyEmail = async (email, otp) => {
         });
     }
 };
+const userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes = async () => {
+    await prisma.user.deleteMany({
+        where: {
+            emailVerified: false,
+            createdAt: {
+                lt: new Date(Date.now() - 2 * 60 * 1000), // Created more than 2 minutes ago
+            },
+        },
+    });
+    return { success: true, message: "Unverified users deleted successfully" };
+};
 export const authService = {
     registrationUser,
     logInUser,
     getMe,
     changePassword,
     verifyEmail,
+    userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes,
+    getNewToken,
+    forgetPassword,
 };

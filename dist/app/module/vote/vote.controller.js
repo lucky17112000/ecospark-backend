@@ -4,15 +4,14 @@ import { sendResponse } from "../../../shared/sendResponse";
 import AppError from "../../errorHelper.ts/AppError";
 import status from "http-status";
 const createVote = catchasync(async (req, res) => {
-    const ideaid = req.params.id;
-    console.log("ideaId in controller:", ideaid);
-    if (!ideaid) {
+    console.log("ideaId in controller:", req.body.ideaId);
+    if (!req.body.ideaId) {
         throw new AppError(status.BAD_REQUEST, "Idea id is required");
     }
     if (!req.user) {
         throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
     }
-    const result = await voteService.createVote(req.body, req.user, ideaid);
+    const result = await voteService.createVote(req.body, req.user);
     sendResponse(res, {
         httpStatusCode: 201,
         success: true,

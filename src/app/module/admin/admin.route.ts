@@ -11,8 +11,14 @@ router.get(
   adminController.getOneUserByAdmin,
 );
 router.patch(
-  "/users/:userId/role",
+  "/users/role/:userId",
   cheakAuth(Role.ADMIN),
   adminController.updateUserRoleByAdmin,
 );
+router.delete(
+  "/users/delete/:userId",
+  cheakAuth(Role.ADMIN),
+  adminController.hardDeleteUserByAdmin,
+);
+// router.delete(
 export const adminRoute = router;

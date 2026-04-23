@@ -7,9 +7,8 @@ import AppError from "../../errorHelper.ts/AppError";
 import status from "http-status";
 
 const createVote = catchasync(async (req: Request, res: Response) => {
-  const ideaid = req.params.id;
-  console.log("ideaId in controller:", ideaid);
-  if (!ideaid) {
+  console.log("ideaId in controller:", req.body.ideaId);
+  if (!req.body.ideaId) {
     throw new AppError(status.BAD_REQUEST, "Idea id is required");
   }
   if (!req.user) {
@@ -18,7 +17,6 @@ const createVote = catchasync(async (req: Request, res: Response) => {
   const result = await voteService.createVote(
     req.body,
     req.user as IRequestUser,
-    ideaid as string,
   );
   sendResponse(res, {
     httpStatusCode: 201,

@@ -24,6 +24,7 @@ const loadEnvVariables = () => {
         "CLOUDINARY_CLOUD_NAME",
         "CLOUDINARY_API_KEY",
         "CLOUDINARY_API_SECRET",
+        "REFRESH_TOKEN_SECRET",
     ];
     requiredEnvVars.forEach((variable) => {
         if (!process.env[variable]) {
@@ -57,6 +58,7 @@ const loadEnvVariables = () => {
             CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
         },
         FRONTEND_URL: process.env.FRONTEND_URL,
+        REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
     };
 };
 export const envVars = loadEnvVariables();

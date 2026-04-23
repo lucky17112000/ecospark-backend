@@ -1,5 +1,8 @@
 import { prisma } from "../../lib/prisma";
 import { PaymentStatus } from "../../../generated/prisma/enums";
+// import { generateInvoicePdf } from "./payment.utiles";
+// import { uploadFileToCloudinary } from "../../../config/cloudinary.config";
+// import { sendEmail } from "../../utiles/email";
 const handleStripeWebhookEvent = async (event) => {
     //!SECTION
     const existingPayment = await prisma.payment.findFirst({
@@ -24,9 +27,8 @@ const handleStripeWebhookEvent = async (event) => {
             const purchase = await prisma.purchase.findUnique({
                 where: { id: purchaseId },
                 include: {
-                    patient: true,
-                    doctor: true,
-                    schedule: true,
+                    idea: true,
+                    user: true,
                     payment: true,
                 },
             });

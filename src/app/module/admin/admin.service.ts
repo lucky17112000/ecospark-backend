@@ -46,10 +46,8 @@ const getAllUsersByAdmn = async (
     .sort()
     .paginate()
     .include({
-       
       _count: {
         select: {
-          
           ideas: true,
           feedbacks: true,
           votes: true,
@@ -136,8 +134,90 @@ const getOneUserByAdmin = async (userId: string, user: IRequestUser) => {
   }
   return result;
 };
+
+const softDeleteUserByAdmin = async (userId: string, user: IRequestUser) => {
+  if (user.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
+  const chkAdmin = await prisma.user.findUnique({
+    where: { id: user.userId },
+  });
+  if (chkAdmin?.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
+  const userData = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  if (!userData) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
+  if (userData.email === user.email) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "You cannot delete your own account",
+    );
+  }
+  const result = await prisma.user.update({
+    where: { id: userId },
+    data: { isDeleted: true, deletedAt: new Date() },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true,
+      isDeleted: true,
+      deletedAt: true,
+    },
+  });
+  return result;
+};
+
+const hardDeleteUserByAdmin = async (userId: string, user: IRequestUser) => {
+  if (user.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
+  const chkAdmin = await prisma.user.findUnique({
+    where: { id: user.userId },
+  });
+  if (chkAdmin?.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
+  const userData = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  if (!userData) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
+  if (userData.email === user.email) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "You cannot delete your own account",
+    );
+  }
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+  return { message: "User deleted successfully" };
+};
+
 export const adminService = {
   getAllUsersByAdmn,
   updateUserRoleByAdmin,
   getOneUserByAdmin,
+  softDeleteUserByAdmin,
+  // getDeletedUsersByAdmin,
+  hardDeleteUserByAdmin,
 };

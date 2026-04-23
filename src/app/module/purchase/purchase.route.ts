@@ -13,10 +13,15 @@ router.post(
   purchaseController.createPurchase,
 );
 
-router.get("/", cheakAuth(Role.ADMIN), purchaseController.getAllPurchases);
+router.get(
+  "/",
+  cheakAuth(Role.ADMIN, Role.USER),
+  purchaseController.getAllPurchases,
+);
 router.get(
   "/me",
   cheakAuth(Role.USER),
+  // cheakAuth(Role.ADMIN),
   purchaseController.getIndividualPurchase,
 );
 export const purchaseRouter = router;

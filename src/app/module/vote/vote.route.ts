@@ -5,11 +5,7 @@ import { Role } from "../../../generated/prisma/enums";
 
 const router = Router();
 
-router.post(
-  "/:id",
-  cheakAuth(Role.USER, Role.ADMIN),
-  voteController.createVote,
-);
+router.post("/", cheakAuth(Role.USER, Role.ADMIN), voteController.createVote);
 
 router.get("/upvotes/:id", voteController.countUpVotes);
 router.get("/downvotes/:id", voteController.countDownVotes);

@@ -48,7 +48,7 @@ cron.schedule("*/30 * * * *", async () => {
 });
 
 // Every 2 minutes (node-cron supports a 6-field format: second minute hour day month weekDay)
-cron.schedule("*/2 * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
   try {
     console.log("Running cron job to delete unverified users...");
     await authService.userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes();

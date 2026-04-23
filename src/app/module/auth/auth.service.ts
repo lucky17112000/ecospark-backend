@@ -10,6 +10,11 @@ import { Role, USER_STATUS } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { tokenUtil } from "../../utiles/token";
 import { IRequestUser } from "../../interface/requestUser.interface";
+// import { setTokenUtil } from "better-auth/oauth2";
+import { envVars } from "../../config/env";
+import { jwtUtils } from "../../utiles/jwt";
+import { JwtPayload } from "jsonwebtoken";
+import { get } from "node:http";
 
 const registrationUser = async (payload: IRegisterPatientPayload) => {
   const { name, email, password, role } = payload;
@@ -107,6 +112,7 @@ const getMe = async (user: IRequestUser) => {
       role: true,
       emailVerified: true,
       status: true,
+      purchases: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -116,9 +122,113 @@ const getMe = async (user: IRequestUser) => {
   }
   return existingUser;
 };
+const getNewToken = async (refreshToken: string, sessionToken: string) => {
+  //exiting session token er time barate hobe new session token amader die make kora possible na karon session token ase better auth theke but amra time barai dite pari
+  //manually session token getting proccess  change passsword e  better auth er away te access kora hoyece so duitai same kaj kore
+  const isSessonTokenExists = await prisma.session.findUnique({
+    where: {
+      token: sessionToken,
+    },
+    include: {
+      user: true,
+    },
+  });
+  if (!isSessonTokenExists) {
+    throw new AppError(status.UNAUTHORIZED, "User is not logged in");
+  }
 
-const changePassword = async (payload: IChangePasswordPayload) => {
+  const verifiedRefreshToken = jwtUtils.verifyToken(
+    refreshToken,
+    envVars.REFRESH_TOKEN_SECRET,
+  );
+  if (!verifiedRefreshToken) {
+    throw new AppError(status.UNAUTHORIZED, "Invalid refresh token");
+  }
+  const data = verifiedRefreshToken.data as JwtPayload;
+
+  const newAccessToken = tokenUtil.getAccessToken({
+    userId: data.id,
+    role: data.role,
+    name: data.name,
+    email: data.email,
+    emailVerified: data.emailVerified,
+    status: data.status,
+    isDeleted: data.isDeleted,
+  });
+  const newRefreshToken = tokenUtil.getRefreshToken({
+    userId: data.id,
+    role: data.role,
+    name: data.name,
+    email: data.email,
+    emailVerified: data.emailVerified,
+    status: data.status,
+    isDeleted: data.isDeleted,
+  });
+  const updatedSession = await prisma.session.update({
+    where: {
+      token: sessionToken,
+    },
+    data: {
+      token: sessionToken,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), //! 1 days
+      updatedAt: new Date(),
+    },
+  });
+
+  //!SECTION end
+  return {
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+    sessionToken: updatedSession.token,
+  };
+};
+
+const changePassword = async (
+  payload: IChangePasswordPayload,
+  sessionToken: string,
+) => {
   // const session  =
+  const sesison = await auth.api.getSession({
+    headers: {
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!sesison) {
+    throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+  }
+  const { currentPassword, newPassword } = payload;
+  const result = await auth.api.changePassword({
+    body: {
+      currentPassword,
+      newPassword,
+    },
+    headers: {
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  // return result;
+
+  return { success: true, message: "Password changed successfully" };
+};
+const forgetPassword = async (email: string) => {
+  const isUserExists = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!isUserExists) {
+    throw new AppError(status.NOT_FOUND, "User not found");
+  }
+  if (!isUserExists.emailVerified) {
+    throw new AppError(status.BAD_REQUEST, "Email is not verified");
+  }
+  if (isUserExists.status === USER_STATUS.DELETED) {
+    throw new AppError(status.BAD_REQUEST, "User is deleted");
+  }
+
+  await auth.api.requestPasswordResetEmailOTP({
+    body: {
+      email,
+    },
+  });
 };
 
 const verifyEmail = async (email: string, otp: string) => {
@@ -155,4 +265,6 @@ export const authService = {
   changePassword,
   verifyEmail,
   userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes,
+  getNewToken,
+  forgetPassword,
 };

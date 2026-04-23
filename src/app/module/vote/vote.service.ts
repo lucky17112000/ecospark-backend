@@ -4,14 +4,10 @@ import { IRequestUser } from "../../interface/requestUser.interface";
 import { prisma } from "../../lib/prisma";
 import { ICreateVotePayload, IRemoveVotePayload } from "./vote.interface";
 
-const createVote = async (
-  payload: ICreateVotePayload,
-  user: IRequestUser,
-  ideaId: string,
-) => {
+const createVote = async (payload: ICreateVotePayload, user: IRequestUser) => {
   const { type } = payload;
   const dataFromIdeaId = await prisma.idea.findUnique({
-    where: { id: ideaId },
+    where: { id: payload.ideaId },
     include: {
       votes: true,
       author: true,
@@ -41,7 +37,7 @@ const createVote = async (
   }
   const result = await prisma.vote.create({
     data: {
-      ideaId,
+      ideaId: payload.ideaId,
       type,
       userId: user.userId,
     },
