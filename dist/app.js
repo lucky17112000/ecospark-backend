@@ -1,17 +1,14 @@
 import express from "express";
 import { appRouter } from "./app/routes/index.js";
 import cookieParser from "cookie-parser";
+import { PaymentController } from "./app/module/payment/payment.controller.js";
 import { envVars } from "./app/config/env.js";
 import cors from "cors";
 import { globalErrorHandler } from "./app/midddlware/globalErrorHandler.js";
 import { notFound } from "./app/midddlware/notFound.js";
 const app = express();
 app.use(express.urlencoded({ extended: true }));
-// app.post(
-//   "/webhook",
-//   express.raw({ type: "application/json" }),
-//   PaymentController.handleStripeWebhookEvent,
-// );
+app.post("/webhook", express.raw({ type: "application/json" }), PaymentController.handleStripeWebhookEvent);
 /**!SECTION
  *
  *

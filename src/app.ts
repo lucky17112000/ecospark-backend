@@ -7,11 +7,11 @@ import cron from "node-cron";
 import { ideaService } from "./app/module/idea/idea.services";
 import { envVars } from "./app/config/env";
 import cors from "cors";
-import AppError from "./app/errorHelper.ts/AppError";
-import status from "http-status";
+// import AppError from "./app/errorHelper.ts/AppError";
+// import status from "http-status";
 import { globalErrorHandler } from "./app/midddlware/globalErrorHandler";
 import { notFound } from "./app/midddlware/notFound";
-import { authService } from "./app/module/auth/auth.service";
+// import { authService } from "./app/module/auth/auth.service";
 
 const app: Application = express();
 app.use(express.urlencoded({ extended: true }));
