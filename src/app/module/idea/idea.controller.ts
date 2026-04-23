@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { ideaService } from "./idea.services";
-import { IcreateIdeaPayload } from "./idea.interface";
+import {
+  IChangeIspaidFalseToTruePayload,
+  IcreateIdeaPayload,
+} from "./idea.interface";
 import { sendResponse } from "../../../shared/sendResponse";
 import status from "http-status";
 import { IRequestUser } from "../../interface/requestUser.interface";
@@ -139,6 +142,44 @@ const updateIdeaStatuswithFeedback = catchasync(
   },
 );
 
+const changeIspaidFalseToTrue = async (req: Request, res: Response) => {
+  const id = req.user;
+  const data = req.body;
+  if (!id) {
+    throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+  }
+  const result = await ideaService.changeIspaidFalseToTrue(
+    data as IChangeIspaidFalseToTruePayload,
+    id as IRequestUser,
+  );
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Idea isPaid status updated successfully",
+    data: result,
+  });
+};
+
+const changeApprovedToUnderReview = catchasync(
+  async (req: Request, res: Response) => {
+    const id = req.user;
+    const data = req.body;
+    if (!id) {
+      throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+    }
+    const result = await ideaService.changeApprovedToUnderReview(
+      data,
+      id as IRequestUser,
+    );
+    sendResponse(res, {
+      httpStatusCode: status.OK,
+      success: true,
+      message: "Idea status changed from approved to under review successfully",
+      data: result,
+    });
+  },
+);
+
 export const ideaController = {
   createIdea,
   getAllIdeas,
@@ -148,4 +189,6 @@ export const ideaController = {
   deleteIdeaSoft,
   updateIdeaStatuswithFeedback,
   deleteIdeaSoftByAdmin,
+  changeIspaidFalseToTrue,
+  changeApprovedToUnderReview,
 };

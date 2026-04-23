@@ -64,7 +64,7 @@ const createPurchase = async (payload, user) => {
             purchaseId: result.id,
             paymentId: paymentData.id,
         },
-        success_url: `${envVars.FRONTEND_URL}/dashboard/`,
+        success_url: `${envVars.FRONTEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${envVars.FRONTEND_URL}/dashboard/purchase`,
     });
     return {

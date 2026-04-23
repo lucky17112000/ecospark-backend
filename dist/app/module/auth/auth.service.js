@@ -91,6 +91,7 @@ const getMe = async (user) => {
             role: true,
             emailVerified: true,
             status: true,
+            purchases: true,
             createdAt: true,
             updatedAt: true,
         },

@@ -25,9 +25,21 @@ router.put(
   validateRequest(ideaValidator.updateIdeaStatusZodSchema),
   ideaController.updateIdeaStatuswithFeedback,
 );
+router.put(
+  "/change-ispaid",
+  cheakAuth(Role.ADMIN),
+
+  validateRequest(ideaValidator.changeIsPaidZodSchema),
+  ideaController.changeIspaidFalseToTrue,
+);
 // router.delete("/:id", cheakAuth(Role.ADMIN), ideaController.deleteIdea);
 // router.delete("/soft/:id", ideaController.deleteIdeaSoft);
 // router.delete("/soft", cheakAuth(Role.ADMIN), ideaController.deleteIdeaSoft);
+router.put(
+  "/change-approved-to-under-review",
+  cheakAuth(Role.ADMIN),
+  ideaController.changeApprovedToUnderReview,
+);
 router.delete(
   "/soft/by-admin",
   cheakAuth(Role.ADMIN),

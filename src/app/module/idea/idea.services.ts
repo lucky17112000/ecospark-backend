@@ -1,7 +1,11 @@
 import status from "http-status";
 import AppError from "../../errorHelper.ts/AppError";
 import { prisma } from "../../lib/prisma";
-import { IcreateIdeaPayload, IUpdateIdeaPayload } from "./idea.interface";
+import {
+  IChangeIspaidFalseToTruePayload,
+  IcreateIdeaPayload,
+  IUpdateIdeaPayload,
+} from "./idea.interface";
 import { th } from "zod/locales";
 import { IRequestUser } from "../../interface/requestUser.interface";
 import { QueryBuilder } from "../../utiles/QueryBuilder";
@@ -310,6 +314,60 @@ const deleteIdeaSoftByAdmin = async (id: string, user: IRequestUser) => {
   });
   return result;
 };
+const changeIspaidFalseToTrue = async (
+  payload: IChangeIspaidFalseToTruePayload,
+  user: IRequestUser,
+) => {
+  if (user.role !== "ADMIN") {
+    throw new AppError(status.FORBIDDEN, "Only admin can update this idea");
+  }
+  const { ideaId, isPaid } = payload;
+  if (!ideaId) {
+    throw new AppError(status.BAD_REQUEST, "ideaId is required");
+  }
+  const idea = await prisma.idea.findUnique({
+    where: { id: ideaId },
+    select: { id: true, isPaid: true },
+  });
+  if (!idea) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  // if (idea.isPaid) {
+  //   throw new AppError(status.BAD_REQUEST, "Idea is already marked as paid");
+  // }
+  const nextIsPaid = typeof isPaid === "boolean" ? isPaid : !idea.isPaid;
+  const updatedIdea = await prisma.idea.update({
+    where: { id: ideaId },
+    data: { isPaid: nextIsPaid },
+  });
+  return updatedIdea;
+};
+export const changeApprovedToUnderReview = async (
+  ideaId: string,
+  user: IRequestUser,
+) => {
+  if (user.role !== "ADMIN") {
+    throw new AppError(status.FORBIDDEN, "Only admin can change idea status");
+  }
+  const idea = await prisma.idea.findUnique({
+    where: { id: ideaId },
+    select: { id: true, status: true },
+  });
+  if (!idea) {
+    throw new AppError(status.NOT_FOUND, "Idea not found");
+  }
+  if (idea.status !== "APPROVED") {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Idea status must be APPROVED to change it back to UNDER_REVIEW",
+    );
+  }
+  const updatedIdea = await prisma.idea.update({
+    where: { id: ideaId },
+    data: { status: "UNDER_REVIEW" },
+  });
+  return updatedIdea;
+};
 
 export const ideaService = {
   createIdea,
@@ -322,4 +380,6 @@ export const ideaService = {
   getOneUserAllIdeas,
   updateIdeaStatusWithFeedback,
   deleteIdeaSoftByAdmin,
+  changeIspaidFalseToTrue,
+  changeApprovedToUnderReview,
 };

@@ -52,3 +52,7 @@ export interface IUpdateIdeaPayload {
   categoryId?: string;
   price?: number;
 }
+export interface IChangeIspaidFalseToTruePayload {
+  ideaId: string;
+  isPaid?: boolean;
+}

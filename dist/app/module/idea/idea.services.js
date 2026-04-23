@@ -251,6 +251,51 @@ const deleteIdeaSoftByAdmin = async (id, user) => {
     });
     return result;
 };
+const changeIspaidFalseToTrue = async (payload, user) => {
+    if (user.role !== "ADMIN") {
+        throw new AppError(status.FORBIDDEN, "Only admin can update this idea");
+    }
+    const { ideaId, isPaid } = payload;
+    if (!ideaId) {
+        throw new AppError(status.BAD_REQUEST, "ideaId is required");
+    }
+    const idea = await prisma.idea.findUnique({
+        where: { id: ideaId },
+        select: { id: true, isPaid: true },
+    });
+    if (!idea) {
+        throw new AppError(status.NOT_FOUND, "Idea not found");
+    }
+    // if (idea.isPaid) {
+    //   throw new AppError(status.BAD_REQUEST, "Idea is already marked as paid");
+    // }
+    const nextIsPaid = typeof isPaid === "boolean" ? isPaid : !idea.isPaid;
+    const updatedIdea = await prisma.idea.update({
+        where: { id: ideaId },
+        data: { isPaid: nextIsPaid },
+    });
+    return updatedIdea;
+};
+export const changeApprovedToUnderReview = async (ideaId, user) => {
+    if (user.role !== "ADMIN") {
+        throw new AppError(status.FORBIDDEN, "Only admin can change idea status");
+    }
+    const idea = await prisma.idea.findUnique({
+        where: { id: ideaId },
+        select: { id: true, status: true },
+    });
+    if (!idea) {
+        throw new AppError(status.NOT_FOUND, "Idea not found");
+    }
+    if (idea.status !== "APPROVED") {
+        throw new AppError(status.BAD_REQUEST, "Idea status must be APPROVED to change it back to UNDER_REVIEW");
+    }
+    const updatedIdea = await prisma.idea.update({
+        where: { id: ideaId },
+        data: { status: "UNDER_REVIEW" },
+    });
+    return updatedIdea;
+};
 export const ideaService = {
     createIdea,
     getAllIdeas,
@@ -262,4 +307,6 @@ export const ideaService = {
     getOneUserAllIdeas,
     updateIdeaStatusWithFeedback,
     deleteIdeaSoftByAdmin,
+    changeIspaidFalseToTrue,
+    changeApprovedToUnderReview,
 };

@@ -53,7 +53,20 @@ const updateIdeaStatusZodSchema = z.object({
   ]),
 });
 
+const changeIsPaidZodSchema = z
+  .object({
+    ideaId: z.string().min(1, "ideaId is required"),
+    // Support both common casing styles from clients.
+    isPaid: z.boolean().optional(),
+    ispaid: z.boolean().optional(),
+  })
+  .transform((data) => ({
+    ideaId: data.ideaId,
+    isPaid: data.isPaid ?? data.ispaid,
+  }));
+
 export const ideaValidator = {
   createIdeaZodSchema,
   updateIdeaStatusZodSchema,
+  changeIsPaidZodSchema,
 };

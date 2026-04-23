@@ -115,6 +115,34 @@ const updateIdeaStatuswithFeedback = catchasync(async (req, res) => {
         data: result,
     });
 });
+const changeIspaidFalseToTrue = async (req, res) => {
+    const id = req.user;
+    const data = req.body;
+    if (!id) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+    }
+    const result = await ideaService.changeIspaidFalseToTrue(data, id);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        message: "Idea isPaid status updated successfully",
+        data: result,
+    });
+};
+const changeApprovedToUnderReview = catchasync(async (req, res) => {
+    const id = req.user;
+    const data = req.body;
+    if (!id) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized access");
+    }
+    const result = await ideaService.changeApprovedToUnderReview(data, id);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        message: "Idea status changed from approved to under review successfully",
+        data: result,
+    });
+});
 export const ideaController = {
     createIdea,
     getAllIdeas,
@@ -124,4 +152,6 @@ export const ideaController = {
     deleteIdeaSoft,
     updateIdeaStatuswithFeedback,
     deleteIdeaSoftByAdmin,
+    changeIspaidFalseToTrue,
+    changeApprovedToUnderReview,
 };
