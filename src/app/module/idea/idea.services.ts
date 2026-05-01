@@ -52,17 +52,6 @@ const createIdea = async (payload: IcreateIdeaPayload) => {
 };
 
 const getAllIdeas = async (query: IQueryParams) => {
-  // const ideas = await prisma.idea.findMany({
-  //   include: {
-  //     author: true,
-  //     category: true,
-  //     votes: true,
-  //     feedback: true,
-  //     purchases: true,
-  //   },
-  // });
-  // return ideas;
-
   const normalizedQuery: IQueryParams = { ...query };
 
   // If `searchTerm` is a number (e.g. "10"), treat it as a price filter.
@@ -369,6 +358,23 @@ export const changeApprovedToUnderReview = async (
   return updatedIdea;
 };
 
+
+const getLimitedIdeaForHomePage =  async()=>{
+  const ideas = await prisma.idea.findMany({
+    where: {
+      status: "APPROVED",
+      isDeleted: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 4,
+
+  });
+  return ideas;
+    
+}
+
 export const ideaService = {
   createIdea,
   getAllIdeas,
@@ -382,4 +388,5 @@ export const ideaService = {
   deleteIdeaSoftByAdmin,
   changeIspaidFalseToTrue,
   changeApprovedToUnderReview,
+  getLimitedIdeaForHomePage,
 };

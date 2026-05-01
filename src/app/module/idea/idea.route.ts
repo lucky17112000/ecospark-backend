@@ -15,9 +15,10 @@ router.post(
   ideaController.createIdea,
 );
 //  cheakAuth(Role.USER, Role.ADMIN),
-router.get("/", cheakAuth(Role.USER, Role.ADMIN), ideaController.getAllIdeas);
+router.get("/", ideaController.getAllIdeas);
 router.get("/:id", ideaController.getIdeayId);
 // router.put("/:id", ideaController.updateIdea);
+router.get("/home/limited", ideaController.getLimitedIdeaForHomePage);
 
 router.put(
   "/status",

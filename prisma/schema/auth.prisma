@@ -17,9 +17,9 @@ model User {
     ideas              Idea[]
     feedbacks          Feedback[]
     votes              Vote[]
-     payments  Payment[]
-  purchases Purchase[]
-    
+    payments           Payment[]
+    purchases          Purchase[]
+    Blog               Blog[]
 
     @@unique([email])
     @@map("user")

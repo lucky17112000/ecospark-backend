@@ -143,6 +143,15 @@ const changeApprovedToUnderReview = catchasync(async (req, res) => {
         data: result,
     });
 });
+const getLimitedIdeaForHomePage = catchasync(async (req, res) => {
+    const result = await ideaService.getLimitedIdeaForHomePage();
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        message: "Limited ideas for home page retrieved successfully",
+        data: result,
+    });
+});
 export const ideaController = {
     createIdea,
     getAllIdeas,
@@ -154,4 +163,5 @@ export const ideaController = {
     deleteIdeaSoftByAdmin,
     changeIspaidFalseToTrue,
     changeApprovedToUnderReview,
+    getLimitedIdeaForHomePage,
 };

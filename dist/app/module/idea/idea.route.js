@@ -8,9 +8,10 @@ import { multerUpload } from "../../config/multer.config.js";
 const router = Router();
 router.post("/", multerUpload.array("files"), validateRequest(ideaValidator.createIdeaZodSchema), ideaController.createIdea);
 //  cheakAuth(Role.USER, Role.ADMIN),
-router.get("/", cheakAuth(Role.USER, Role.ADMIN), ideaController.getAllIdeas);
+router.get("/", ideaController.getAllIdeas);
 router.get("/:id", ideaController.getIdeayId);
 // router.put("/:id", ideaController.updateIdea);
+router.get("/home/limited", ideaController.getLimitedIdeaForHomePage);
 router.put("/status", cheakAuth(Role.ADMIN), validateRequest(ideaValidator.updateIdeaStatusZodSchema), ideaController.updateIdeaStatuswithFeedback);
 router.put("/change-ispaid", cheakAuth(Role.ADMIN), validateRequest(ideaValidator.changeIsPaidZodSchema), ideaController.changeIspaidFalseToTrue);
 // router.delete("/:id", cheakAuth(Role.ADMIN), ideaController.deleteIdea);

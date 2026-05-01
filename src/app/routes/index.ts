@@ -7,6 +7,8 @@ import { feedbackRouter } from "../module/feedback/feedback.router";
 import { voteRouter } from "../module/vote/vote.route";
 import { purchaseRouter } from "../module/purchase/purchase.route";
 import { adminRoute } from "../module/admin/admin.route";
+import { blogRouter } from "../module/blog/blog.route";
+// import { chatRouter } from "../module/chat/chat.router";
 
 const router = Router();
 router.use("/auth", authRouter);
@@ -16,5 +18,7 @@ router.use("/feedback", feedbackRouter);
 router.use("/vote", voteRouter);
 router.use("/purchase", purchaseRouter);
 router.use("/admin", adminRoute);
+// router.use("/chat", chatRouter);
+router.use("/blog", blogRouter);
 
 export const appRouter = router;
