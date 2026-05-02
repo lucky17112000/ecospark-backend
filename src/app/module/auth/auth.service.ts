@@ -258,6 +258,89 @@ const userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes =
     });
     return { success: true, message: "Unverified users deleted successfully" };
   };
+
+//   const googleLoginSuccess = async (session: Record<string, any>) => {
+//   const ispatientExist = await prisma.patient.findUnique({
+//     where: {
+//       userId: session.user.id,
+//     },
+//   });
+
+//   if (!ispatientExist) {
+//     await prisma.patient.create({
+//       data: {
+//         userId: session.user.id,
+//         name: session.user.name,
+//         email: session.user.email,
+//       },
+//     });
+//   }
+
+//   const accessToken = tokenUtiles.getAccessToken({
+//     userId: session.user.id,
+//     role: session.user.role,
+//     name: session.user.name,
+//   });
+//   const refreshToken = tokenUtiles.getRefreshToken({
+//     userId: session.user.id,
+//     role: session.user.role,
+//     name: session.user.name,
+//   });
+//   return {
+//     accessToken,
+//     refreshToken,
+//   };
+// };
+
+const googleLoginSuccess = async (session: Record<string, any>) => {
+  if (!session?.user?.id || !session?.user?.email) {
+    throw new AppError(status.UNAUTHORIZED, "Invalid session data");
+  }
+
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+  });
+
+  if (!isUserExist) {
+    await prisma.user.create({
+      data: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        emailVerified: true,
+        role: session.user.role || Role.USER,
+        status: session.user.status || USER_STATUS.ACTIVE,
+        needPasswordChange: false,
+        isDeleted: false,
+      },
+    });
+  }
+
+  const accessToken = tokenUtil.getAccessToken({
+    userId: session.user.id,
+    role: session.user.role,
+    name: session.user.name,
+    email: session.user.email,
+    emailVerified: session.user.emailVerified,
+    status: session.user.status,
+    isDeleted: session.user.isDeleted,
+  });
+  const refreshToken = tokenUtil.getRefreshToken({
+    userId: session.user.id,
+    role: session.user.role,
+    name: session.user.name,
+    email: session.user.email,
+    emailVerified: session.user.emailVerified,
+    status: session.user.status,
+    isDeleted: session.user.isDeleted,
+  });
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
 export const authService = {
   registrationUser,
   logInUser,
@@ -267,4 +350,5 @@ export const authService = {
   userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes,
   getNewToken,
   forgetPassword,
+  googleLoginSuccess,
 };

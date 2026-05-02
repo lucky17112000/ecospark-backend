@@ -11,9 +11,17 @@ import cors from "cors";
 // import status from "http-status";
 import { globalErrorHandler } from "./app/midddlware/globalErrorHandler";
 import { notFound } from "./app/midddlware/notFound";
+import { auth } from "./app/lib/auth";
 // import { authService } from "./app/module/auth/auth.service";
+import { toNodeHandler } from "better-auth/node";
+import path from "path";
 
 const app: Application = express();
+// app.set("queries parser", (str: string) => qs.parse(str));
+app.set("views", path.resolve(process.cwd(), "src/app/templates"));
+app.set("view engine", "ejs");
+
+app.all("/api/auth/*path", toNodeHandler(auth));
 app.use(express.urlencoded({ extended: true }));
 app.post(
   "/webhook",

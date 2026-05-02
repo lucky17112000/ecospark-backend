@@ -6,6 +6,7 @@ import status from "http-status";
 import { auth } from "../../lib/auth";
 import { tokenUtil } from "../../utiles/token";
 import AppError from "../../errorHelper.ts/AppError";
+import { envVars } from "../../config/env";
 
 const registerUser = catchasync(async (req: Request, res: Response) => {
   const payload = req.body;
@@ -108,6 +109,47 @@ const forgetPassword = catchasync(async (req: Request, res: Response) => {
   });
 });
 
+const handleOAuthError = catchasync(async (req: Request, res: Response) => {
+  const error = (req.query.error as string) || "oauth_failed";
+  res.redirect(`${envVars.FRONTEND_URL}/login?error=${error}`);
+});
+
+const googleLogin = catchasync(async (req: Request, res: Response) => {
+  const redirectPath = (req.query.redirect as string) || "/dashboard";
+  const encodedRedirectPath = encodeURIComponent(redirectPath as string);
+  const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodedRedirectPath}`;
+  res.render("googleRedirect", {
+    callbackURL: callbackURL,
+    betterAuthUrl: envVars.BETTER_AUTH_URL,
+  });
+});
+
+const googleLoginSuccess = catchasync(async (req: Request, res: Response) => {
+  const redirectPath = (req.query.redirect as string) || "/";
+  const sessionToken = req.cookies["better-auth.session_token"];
+  if (!sessionToken) {
+    return res.redirect(`${envVars.FRONTEND_URL}/login?error=oauth_failed`);
+  }
+  const session = await auth.api.getSession({
+    headers: {
+      cookie: `better-auth.session_token=${sessionToken}`,
+    },
+  });
+  if (session && !session?.user) {
+    return res.redirect(`${envVars.FRONTEND_URL}/login?error=no_user_found`);
+  }
+  const result = await authService.googleLoginSuccess(
+    session as Record<string, any>,
+  );
+  const { accessToken, refreshToken } = result;
+  tokenUtil.setAccessTokenCookie(res, accessToken);
+  tokenUtil.setRefreshTokenCookie(res, refreshToken);
+  const isValidRedirectPath =
+    redirectPath.startsWith("/") && !redirectPath.startsWith("//");
+  const finalRedirectPath = isValidRedirectPath ? redirectPath : "/dashboard";
+  res.redirect(`${envVars.FRONTEND_URL}${finalRedirectPath}`);
+});
+
 export const authController = {
   registerUser,
   verifyEmail,
@@ -116,4 +158,7 @@ export const authController = {
   getNewToken,
   changePassword,
   forgetPassword,
+  googleLogin,
+  googleLoginSuccess,
+  handleOAuthError,
 };

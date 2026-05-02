@@ -4,7 +4,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { Role, USER_STATUS } from "../../generated/prisma/enums";
 import { bearer, emailOTP, oAuthProxy, openAPI } from "better-auth/plugins";
-import { tr } from "zod/locales";
+import { en, tr } from "zod/locales";
 import { sendEmail } from "../utiles/email";
 import { envVars } from "../config/env";
 // If your Prisma file is located elsewhere, you can change the path
@@ -14,12 +14,30 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql", // or "mysql", "postgresql", ...etc
   }),
-  baseURL: envVars.FRONTEND_URL,
-  trustedOrigins: [envVars.FRONTEND_URL!],
+  baseURL: envVars.BETTER_AUTH_URL,
+  trustedOrigins: [envVars.BETTER_AUTH_URL!, envVars.FRONTEND_URL!],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
   },
+  socialProviders: {
+    google: {
+      clientId: envVars.GOOGLE_CLIENT_ID!,
+      clientSecret: envVars.GOOGLE_CLIENT_SECRET!,
+      // callbackUrl: envVars.GOOGLE_CALLBACK_URL!,
+      mapProfileToUser: (profile) => {
+        return {
+          role: Role.USER,
+          status: USER_STATUS.ACTIVE,
+          needPasswordChange: false,
+          emailVerified: true,
+          isDeleted: false,
+          deletedAt: null,
+        };
+      },
+    },
+  },
+
   emailVerification: {
     sendOnSignUp: true,
     sendOnSignIn: true,
@@ -106,8 +124,12 @@ export const auth = betterAuth({
       maxAge: 60 * 60 * 60 * 24, // 1 day in seconds
     },
   },
+  redirectURLs: {
+    signIn: `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success`,
+  },
 
   advanced: {
+    // useSecureCookies: false,
     cookies: {
       session_token: {
         name: "session_token", // Force this exact name
