@@ -222,6 +222,70 @@ const userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes = async (
     });
     return { success: true, message: "Unverified users deleted successfully" };
 };
+//   const googleLoginSuccess = async (session: Record<string, any>) => {
+//   const ispatientExist = await prisma.patient.findUnique({
+//     where: {
+//       userId: session.user.id,
+//     },
+//   });
+//   if (!ispatientExist) {
+//     await prisma.patient.create({
+//       data: {
+//         userId: session.user.id,
+//         name: session.user.name,
+//         email: session.user.email,
+//       },
+//     });
+//   }
+//   const accessToken = tokenUtiles.getAccessToken({
+//     userId: session.user.id,
+//     role: session.user.role,
+//     name: session.user.name,
+//   });
+//   const refreshToken = tokenUtiles.getRefreshToken({
+//     userId: session.user.id,
+//     role: session.user.role,
+//     name: session.user.name,
+//   });
+//   return {
+//     accessToken,
+//     refreshToken,
+//   };
+// };
+const googleLoginSuccess = async (session) => {
+    // if (!session?.user?.id || !session?.user?.email) {
+    //   throw new AppError(status.UNAUTHORIZED, "Invalid session data");
+    // }
+    const isUserExist = await prisma.user.findUnique({
+        where: {
+            id: session.user.id,
+        },
+    });
+    if (!isUserExist) {
+        await prisma.user.create({
+            data: {
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.name,
+                role: session.user.role,
+            },
+        });
+    }
+    const accessToken = tokenUtil.getAccessToken({
+        userId: session.user.id,
+        role: session.user.role,
+        name: session.user.name,
+    });
+    const refreshToken = tokenUtil.getRefreshToken({
+        userId: session.user.id,
+        role: session.user.role,
+        name: session.user.name,
+    });
+    return {
+        accessToken,
+        refreshToken,
+    };
+};
 export const authService = {
     registrationUser,
     logInUser,
@@ -231,4 +295,5 @@ export const authService = {
     userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes,
     getNewToken,
     forgetPassword,
+    googleLoginSuccess,
 };

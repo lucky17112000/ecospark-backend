@@ -2,8 +2,10 @@ import { catchasync } from "../../../shared/cathAsync.js";
 import { authService } from "./auth.service.js";
 import { sendResponse } from "../../../shared/sendResponse.js";
 import status from "http-status";
+import { auth } from "../../lib/auth.js";
 import { tokenUtil } from "../../utiles/token.js";
 import AppError from "../../errorHelper.ts/AppError.js";
+import { envVars } from "../../config/env.js";
 const registerUser = catchasync(async (req, res) => {
     const payload = req.body;
     const result = await authService.registrationUser(payload);
@@ -93,6 +95,80 @@ const forgetPassword = catchasync(async (req, res) => {
         data: result,
     });
 });
+const handleOAuthError = catchasync(async (req, res) => {
+    const error = req.query.error || "oauth_failed";
+    res.redirect(`${envVars.FRONTEND_URL}/login?error=${error}`);
+});
+const googleLogin = catchasync(async (req, res) => {
+    const redirectPath = req.query.redirect || "/";
+    const encodedRedirectPath = encodeURIComponent(redirectPath);
+    const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodedRedirectPath}`;
+    res.render("googleRedirect", {
+        callbackURL: callbackURL,
+        betterAuthUrl: envVars.BETTER_AUTH_URL,
+    });
+});
+// const googleLogin = catchasync(async (req: Request, res: Response) => {
+//   const redirectPath = (req.query.redirect as string) || "/dashboard";
+//   const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodeURIComponent(redirectPath)}`;
+//   console.log("🔵 googleLogin called");
+//   console.log("BETTER_AUTH_URL:", envVars.BETTER_AUTH_URL);
+//   console.log("callbackURL:", callbackURL);
+//   try {
+//     const response = await fetch(
+//       `${envVars.BETTER_AUTH_URL}/api/auth/sign-in/social`,
+//       {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ provider: "google", callbackURL }),
+//       },
+//     );
+//     console.log("Better Auth response status:", response.status);
+//     const data = await response.json();
+//     console.log("Better Auth response data:", data);
+//     const cookies =
+//       typeof response.headers.getSetCookie === "function"
+//         ? response.headers.getSetCookie()
+//         : ([response.headers.get("set-cookie")].filter(Boolean) as string[]);
+//     if (cookies.length > 0) {
+//       res.setHeader("Set-Cookie", cookies);
+//     }
+//     if (data?.url) {
+//       return res.redirect(data.url);
+//     }
+//     console.log("❌ No URL in response");
+//     return res.redirect(`${envVars.FRONTEND_URL}/login?error=oauth_failed`);
+//   } catch (error) {
+//     console.error("❌ fetch to Better Auth failed:", error);
+//     return res.redirect(`${envVars.FRONTEND_URL}/login?error=server_error`);
+//   }
+// });
+const googleLoginSuccess = catchasync(async (req, res) => {
+    const redirectPath = req.query.redirect || "/";
+    const sessionToken = req.cookies["better-auth.session_token"];
+    if (!sessionToken) {
+        return res.redirect(`${envVars.FRONTEND_URL}/login?error=oauth_failed`);
+    }
+    const session = await auth.api.getSession({
+        headers: {
+            "Cookie": `better-auth.session_token=${sessionToken}`
+        }
+    });
+    if (!session) {
+        return res.redirect(`${envVars.FRONTEND_URL}/login?error=no_session_found`);
+    }
+    if (session && !session.user) {
+        return res.redirect(`${envVars.FRONTEND_URL}/login?error=no_user_found`);
+    }
+    const result = await authService.googleLoginSuccess(session);
+    const { accessToken, refreshToken } = result;
+    tokenUtil.setAccessTokenCookie(res, accessToken);
+    tokenUtil.setRefreshTokenCookie(res, refreshToken);
+    // ?redirect=//profile -> /profile
+    const isValidRedirectPath = redirectPath.startsWith("/") && !redirectPath.startsWith("//");
+    const finalRedirectPath = isValidRedirectPath ? redirectPath : "/";
+    res.redirect(`${envVars.FRONTEND_URL}${finalRedirectPath}`);
+});
 export const authController = {
     registerUser,
     verifyEmail,
@@ -101,4 +177,7 @@ export const authController = {
     getNewToken,
     changePassword,
     forgetPassword,
+    googleLogin,
+    googleLoginSuccess,
+    handleOAuthError,
 };

@@ -9,6 +9,7 @@ const getRefreshToken = (payload) => {
     const refreshToken = jwtUtils.createToken(payload, envVars.BETTER_AUTH_SECRET, { expiresIn: envVars.REFRESH_TOKEN_EXPIRES_IN });
     return refreshToken;
 };
+const isProduction = envVars.NODE_ENV === "production";
 const setAccessTokenCookie = (res, token) => {
     cookieUtil.setCookie(res, "accessToken", token, {
         httpOnly: true,

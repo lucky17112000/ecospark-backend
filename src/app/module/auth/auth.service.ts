@@ -293,13 +293,13 @@ const userDeleteByCornJobwhenEmailNotverifedafterCreatedwithin2Minutes =
 // };
 
 const googleLoginSuccess = async (session: Record<string, any>) => {
-  if (!session?.user?.id || !session?.user?.email) {
-    throw new AppError(status.UNAUTHORIZED, "Invalid session data");
-  }
+  // if (!session?.user?.id || !session?.user?.email) {
+  //   throw new AppError(status.UNAUTHORIZED, "Invalid session data");
+  // }
 
   const isUserExist = await prisma.user.findUnique({
     where: {
-      email: session.user.email,
+      id: session.user.id,
     },
   });
 
@@ -309,11 +309,7 @@ const googleLoginSuccess = async (session: Record<string, any>) => {
         id: session.user.id,
         email: session.user.email,
         name: session.user.name,
-        emailVerified: true,
-        role: session.user.role || Role.USER,
-        status: session.user.status || USER_STATUS.ACTIVE,
-        needPasswordChange: false,
-        isDeleted: false,
+        role: session.user.role,
       },
     });
   }
@@ -322,19 +318,11 @@ const googleLoginSuccess = async (session: Record<string, any>) => {
     userId: session.user.id,
     role: session.user.role,
     name: session.user.name,
-    email: session.user.email,
-    emailVerified: session.user.emailVerified,
-    status: session.user.status,
-    isDeleted: session.user.isDeleted,
   });
   const refreshToken = tokenUtil.getRefreshToken({
     userId: session.user.id,
     role: session.user.role,
     name: session.user.name,
-    email: session.user.email,
-    emailVerified: session.user.emailVerified,
-    status: session.user.status,
-    isDeleted: session.user.isDeleted,
   });
   return {
     accessToken,

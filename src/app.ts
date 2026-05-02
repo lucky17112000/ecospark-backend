@@ -15,13 +15,14 @@ import { auth } from "./app/lib/auth";
 // import { authService } from "./app/module/auth/auth.service";
 import { toNodeHandler } from "better-auth/node";
 import path from "path";
+import qs from "qs";
 
 const app: Application = express();
 // app.set("queries parser", (str: string) => qs.parse(str));
-app.set("views", path.resolve(process.cwd(), "src/app/templates"));
-app.set("view engine", "ejs");
+app.set("query parser", (str: string) => qs.parse(str));
 
-app.all("/api/auth/*path", toNodeHandler(auth));
+app.set("view engine", "ejs");
+app.set("views", path.resolve(process.cwd(), `src/app/templates`));
 app.use(express.urlencoded({ extended: true }));
 app.post(
   "/webhook",
@@ -42,6 +43,7 @@ app.use(
   }),
 );
 
+app.use("/api/auth", toNodeHandler(auth));
 app.use(express.json());
 app.use(cookieParser());
 

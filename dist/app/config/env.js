@@ -24,6 +24,9 @@ const loadEnvVariables = () => {
         "CLOUDINARY_API_KEY",
         "CLOUDINARY_API_SECRET",
         "REFRESH_TOKEN_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_CALLBACK_URL",
     ];
     requiredEnvVars.forEach((variable) => {
         if (!process.env[variable]) {
@@ -58,6 +61,9 @@ const loadEnvVariables = () => {
         },
         FRONTEND_URL: process.env.FRONTEND_URL,
         REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL,
     };
 };
 export const envVars = loadEnvVariables();
