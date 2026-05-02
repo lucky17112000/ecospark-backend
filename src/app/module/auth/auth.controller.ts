@@ -115,7 +115,7 @@ const handleOAuthError = catchasync(async (req: Request, res: Response) => {
 });
 
 const googleLogin = catchasync(async (req: Request, res: Response) => {
-  const redirectPath = (req.query.redirect as string) || "/dashboard";
+  const redirectPath = (req.query.redirect as string) || "/";
   const encodedRedirectPath = encodeURIComponent(redirectPath as string);
   const callbackURL = `${envVars.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodedRedirectPath}`;
   res.render("googleRedirect", {
