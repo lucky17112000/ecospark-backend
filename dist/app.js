@@ -12,11 +12,12 @@ import { auth } from "./app/lib/auth.js";
 // import { authService } from "./app/module/auth/auth.service.js";
 import { toNodeHandler } from "better-auth/node";
 import path from "path";
+import qs from "qs";
 const app = express();
 // app.set("queries parser", (str: string) => qs.parse(str));
-app.set("views", path.resolve(process.cwd(), "src/app/templates"));
+app.set("query parser", (str) => qs.parse(str));
 app.set("view engine", "ejs");
-app.all("/api/auth/*path", toNodeHandler(auth));
+app.set("views", path.resolve(process.cwd(), `src/app/templates`));
 app.use(express.urlencoded({ extended: true }));
 app.post("/webhook", express.raw({ type: "application/json" }), PaymentController.handleStripeWebhookEvent);
 /**!SECTION
@@ -29,6 +30,7 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 }));
+app.use("/api/auth", toNodeHandler(auth));
 app.use(express.json());
 app.use(cookieParser());
 // Every 2 seconds (node-cron supports a 6-field format: second minute hour day month weekDay)

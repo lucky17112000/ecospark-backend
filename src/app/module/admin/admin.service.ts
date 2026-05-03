@@ -212,6 +212,78 @@ const hardDeleteUserByAdmin = async (userId: string, user: IRequestUser) => {
   });
   return { message: "User deleted successfully" };
 };
+//get user cout , admi count, idividual category idea count voye count by admin
+const getAdminDashboardStats = async (user: IRequestUser) => {
+  if (user.role !== "ADMIN") {
+    throw new AppError(
+      status.FORBIDDEN,
+      "Only admins can access this resource",
+    );
+  }
+  // const chkAdmin = await prisma.user.findUnique({
+  //   where: { id: user.userId },
+  // });
+  // if (chkAdmin?.role !== "ADMIN") {
+  //   throw new AppError(
+  //     status.FORBIDDEN,
+  //     "Only admins can access this resource",
+  //   );
+  // }
+  const totalUsers = await prisma.user.count({
+    where: { role: "USER" },
+  });
+  const totalAdmins = await prisma.user.count({
+    where: { role: "ADMIN" },
+  });
+  //Energy ,Plastic, Tree,Others
+  const totalEnergyIdeas = await prisma.idea.count({
+    where: { category: { name: "Energy" } },
+  });
+  const totalPlasticIdeas = await prisma.idea.count({
+    where: { category: { name: "Plastic" } },
+  });
+  const totalTreeIdeas = await prisma.idea.count({
+    where: { category: { name: "Tree" } },
+  });
+  const totalOthersIdeas = await prisma.idea.count({
+    where: { category: { name: "Others" } },
+  });
+
+  return {
+    totalUsers,
+    totalAdmins,
+    totalEnergyIdeas,
+    totalPlasticIdeas,
+    totalTreeIdeas,
+    totalOthersIdeas,
+  };
+};
+//individual user idea count, approved idea count, total vote count catcjh by user
+const getIndividualUserStats = async (user: IRequestUser) => {
+  //dont need to check role because user can access their own stats
+  const totalIdeas = await prisma.idea.count({
+    where: { authorId: user.userId },
+  });
+  const approvedIdeas = await prisma.idea.count({
+    where: { authorId: user.userId, status: "APPROVED" },
+  });
+  const totalVotes = await prisma.vote.count({
+    where: { userId: user.userId },
+  });
+  const totalUpVotes = await prisma.vote.count({
+    where: { userId: user.userId, type: "UP" },
+  });
+  const totalDownVotes = await prisma.vote.count({
+    where: { userId: user.userId, type: "DOWN" },
+  });
+  return {
+    totalIdeas,
+    approvedIdeas,
+    totalVotes,
+    totalUpVotes,
+    totalDownVotes,
+  };
+};
 
 export const adminService = {
   getAllUsersByAdmn,
@@ -220,4 +292,6 @@ export const adminService = {
   softDeleteUserByAdmin,
   // getDeletedUsersByAdmin,
   hardDeleteUserByAdmin,
+  getAdminDashboardStats,
+  getIndividualUserStats,
 };

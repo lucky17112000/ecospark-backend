@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma.js";
 import { Role, USER_STATUS } from "../../generated/prisma/enums.js";
-import { bearer, emailOTP } from "better-auth/plugins";
+import { bearer, emailOTP, oAuthProxy } from "better-auth/plugins";
 import { sendEmail } from "../utiles/email.js";
 import { envVars } from "../config/env.js";
 // If your Prisma file is located elsewhere, you can change the path
@@ -69,7 +69,7 @@ export const auth = betterAuth({
         },
     },
     plugins: [
-        // oAuthProxy(),
+        oAuthProxy(),
         bearer(),
         emailOTP({
             overrideDefaultEmailVerification: true,

@@ -57,9 +57,35 @@ const hardDeleteUserByAdmin = catchasync(async (req, res) => {
         message: "User deleted successfully",
     });
 });
+const getAdminDashboardStats = catchasync(async (req, res) => {
+    if (!req.user) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+    }
+    const result = await adminService.getAdminDashboardStats(req.user);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        data: result,
+        message: "Admin dashboard stats retrieved successfully",
+    });
+});
+const getIndividualUserStats = catchasync(async (req, res) => {
+    if (!req.user) {
+        throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+    }
+    const result = await adminService.getIndividualUserStats(req.user);
+    sendResponse(res, {
+        httpStatusCode: status.OK,
+        success: true,
+        data: result,
+        message: "Individual user stats retrieved successfully",
+    });
+});
 export const adminController = {
     getAllUsersByAdmin,
     updateUserRoleByAdmin,
     getOneUserByAdmin,
+    getAdminDashboardStats,
     hardDeleteUserByAdmin,
+    getIndividualUserStats,
 };
